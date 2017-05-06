@@ -46,4 +46,4 @@ config is an Object literal that contains the following keys:
 
 *fetchSelector* :- Object literal that contains the name for the data as the key and the element selector
 
-#still in development
+# still in development
