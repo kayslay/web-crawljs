@@ -13,11 +13,11 @@ let Crawler = function (config = {}) {
             visitedLinks: [],
             initialLinks: []
         },
-        urls, fetchFn, nextFn, finalLoopFn,finalFn, counter = 0,
+        urls, fetchFn, nextFn, finalLoopFn, finalFn, counter = 0,
         //
         {getDomContents} = require('./dom')(_priv);
     //default function
-    function defaultFn(err, data,url) {
+    function defaultFn(err, data, url) {
         if (err) return console.log(err.message);
         //console.log(data)
     }
@@ -45,10 +45,10 @@ let Crawler = function (config = {}) {
             fetchSelectBy: _priv.fetchSelectBy,
             nextSelector: _priv.nextSelector,
             nextSelectBy: _priv.nextSelectBy,
-            nextFn= defaultFn,
-            fetchFn = defaultFn,
-            finalLoopFn = defaultFinalLoopFn,
-            finalFn= defaultFinalFn,
+            nextFn= defaultFn, //called during the nextCrawlLinks scan
+            fetchFn = defaultFn,  //called during the fetchFromPage scan
+            finalLoopFn = defaultFinalLoopFn, //called after each crawl loop
+            finalFn= defaultFinalFn,  //called after the whole crawl ends
             loop: _priv.loop = 1,
             urls
         } = config);
@@ -91,8 +91,8 @@ let Crawler = function (config = {}) {
      * @private
      */
     function fetchFromPage(url) {
-        let fetchedData = getDomContents(_priv.fetchSelector, _priv.fetchSelectBy, fetchFn,url);
-        pushToPrivateProp('returnedData',(fetchedData));
+        let fetchedData = getDomContents(_priv.fetchSelector, _priv.fetchSelectBy, fetchFn, url);
+        pushToPrivateProp('returnedData', (fetchedData));
         return fetchedData
     }
 
@@ -137,7 +137,7 @@ let Crawler = function (config = {}) {
                 if (err) {
                     console.log(err.message);
                 } else {
-                    let _url= util.getUrlOut(url);
+                    let _url = util.getUrlOut(url);
                     _priv.content = body;
                     fetchFromPage(_url);
                     selectNextCrawlContent(_url);
@@ -148,7 +148,7 @@ let Crawler = function (config = {}) {
                     finalLoopFn();
                     if (counter < _priv.loop) {
                         CrawlAllUrl();
-                    }else{
+                    } else {
                         finalFn()
                     }
                 }
@@ -162,7 +162,7 @@ let Crawler = function (config = {}) {
 
     }
 
-
+//init
     init(config);
 
     return {

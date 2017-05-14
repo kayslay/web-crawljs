@@ -27,6 +27,7 @@ module.exports = function (_priv) {
         let $ = cheerio.load(_priv.content);
         //if the keys don't match
         if (!util.keyMatch(selector, selectBy) && callback) return callback(Error(`An Error Occurred : \n ${KEY_ERROR}`));
+        //this doe nothing for now, since the there is always a callback passed to the getDomContents function
         else if (!util.keyMatch(selector, selectBy)) throw  new Error(`An Error Occurred: \n ${KEY_ERROR}`);
 
         //sets the contentData based on the way the data s organized;
