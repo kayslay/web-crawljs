@@ -110,7 +110,8 @@ The number of times crawl though the links in nextCrawlLinks.
 
 To understand what the loop property does, I would have to explain part of what goes on inside web-crawljs.
 
-web-crawl crawls through all the links in nextCrawlLinks. While crawling through each link in the nextCrawlLinks, the links to crawl next, gotten from the page, are on are pushed to the initialLinks.
+web-crawl crawls through all the links in nextCrawlLinks. While crawling through each link in the nextCrawlLinks, the links to crawl next, gotten from the page, 
+are on are pushed to the initialLinks.
 When through crawling the nextCrawlLinks, the nextCrawlLinks is emptied, then the initialLinks passed to the nextCrawlLinks for the next crawl. 
 It crawls in a Breadth-First manner.
 

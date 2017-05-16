@@ -31,8 +31,8 @@ let Crawler = function (config = {}) {
     //called when the whole crawl is ending
     function defaultFinalFn() {
         console.log('-+'.repeat(30) + counter + '-+'.repeat(30));
-        console.log(`through with crawl after ${counter} number of loops.
-         Got ${getPrivateProp('returnedData').length} contents after the whole crawl`);
+        console.log(`through with crawl after ${counter} number of loops.`);
+        console.log(`Got ${getPrivateProp('returnedData').length} contents after the whole crawl`);
     }
 
     /**

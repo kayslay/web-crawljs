@@ -5,8 +5,8 @@ let cheerio = require('cheerio');
 let util = require('./util');
 module.exports = function (_priv) {
 
-    //error
-    const KEY_ERROR = "the keys dont match. Make sure keys in arg1 matches keys in arg2";
+    //errors
+    const KEY_ERROR = "the keys don't match. Make sure keys in arg1 matches keys in arg2";
 
     /**
      * @description gets the content on the page.
@@ -90,9 +90,6 @@ module.exports = function (_priv) {
         return contentData;
     }
 
-    function sortByGroup(selector, selectBy, $) {
-        return {organize: 'working on it'}
-    }
 
     return {
         getDomContents
