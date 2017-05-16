@@ -1,17 +1,15 @@
 # web-crawlerjs
 
 ## About 
-web-crawlerjs is a package that extracts information from a web page. web-crawljs depends on [request]() and [cheerio]().
+web-crawlerjs is a package that extracts information from a web page. web-crawljs depends on [request](https://www.npmjs.com/package/request) and [cheerio](https://www.npmjs.com/package/cheerio).
 
-web-crawlerjs crawl pages in a [Breadth first]() manner.
+web-crawlerjs crawl pages using a [Breadth-First Algorithm](https://en.wikipedia.org/wiki/Breadth-first_search).
 
 ## Installation 
-Not available for installation yet, still under development. 
-
-If you want to use it before completion clone this repo.
+web-crawljs is not available for installation yet, but, if you want to use it before it is completed, clone this repo.
 
 ## Example
-An Example on the usage of web-crawljs
+An example of the usage of web-crawljs
 ```javascript
     const crawler = require('web-crawljs');
     const config = {
@@ -36,20 +34,20 @@ An Example on the usage of web-crawljs
 ```
 
 ## Understanding the example
-***require('web-crawljs');*** return's a factory function that takes in one argument. The argument is the configuration of the crawler.
+***require('web-crawljs');*** returns a factory function that takes in one argument. This argument is used to configure the behavior of web-crawljs.
         
         const crawler = require('web-crawljs');
         const config = {...}
         const Crawler = crawler(config)
 
-calling *crawler(config)* return's a new Object
+calling *crawler(config)* returns a new Object
 
 ## The config argument
 The config argument is the only argument passed into the crawler factory function. It configure the way the crawler would behave.
 
-### fetching data and setting next links to visit
-This properties are responsible for fetching data and getting the next links to scrap next. The (fetch|next)Selector are used to assign the elements to scrap.
-The (fetch|next)SelectBy is the way you want to select data from the page, e.g you can select by attribute name, text, value, text e.t.c.
+### Fetching data and setting next links to visit
+This properties are responsible for fetching data and getting the next links to scrap next. The fetchSelector and nextSelector are used to assign the elements to scrap.
+The fetchSelectBy and nextSelectBy are used to define the way you want to select data from the page. For example, you can select by attribute name, text, value, text e.t.c.
 
 #### fetchSelector
 Object literal that contains the name for the data as the key and the element selector as value. These are the DOM elements you want to scrap from the page.
@@ -57,10 +55,10 @@ Object literal that contains the name for the data as the key and the element se
 #### fetchSelectBy
 Object literal that contains the name for the data it relates to in the ***fetchSelector*** as the key, and what to select from the element as the value.
 
-**NOTE::** The values used here are actual [cheerio DOM methods]() used by cheerio for getting attributes, text or values for the element. The keys in ***fetchSelector*** and 
-fetchSelectBy must match.
+**NOTE::** The values used here are [cheerio DOM methods]() used by cheerio for getting attributes, text or values for the element. The keys in ***fetchSelector*** and 
+***fetchSelectBy*** must match.
 
-The value of the ***fetchSelectBy*** depends on the method. If the method does not need an argument, use a string named after the method:
+The value of the ***fetchSelectBy*** depends on the method type. If the method does not need an argument, use a string named after the method:
 
             //we are using the cheerio dom methods here
             //using the text method in the 
@@ -93,7 +91,7 @@ This function is called after each fetch operation on the page. The fetchFn take
 - **url** : The current url from the page.
 
 ### nextFn
-This function is called after each next operation on page . takes the same arguments as the fetchFn.
+This function is called after getting the next links to crawl on the page have been scraped. Takes the same arguments as the fetchFn.
 
 ### finalLoopFn
 This is called at the end of the each iteration of the link
