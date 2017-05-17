@@ -6,7 +6,9 @@ web-crawlerjs is a package that extracts information from a web page. web-crawlj
 web-crawlerjs crawl pages using a [Breadth-First Algorithm](https://en.wikipedia.org/wiki/Breadth-first_search).
 
 ## Installation 
-web-crawljs is not available for installation yet, but, if you want to use it before it is completed, clone this repo.
+run this on the command line 
+
+        $ npm install web-crawljs --save
 
 ## Example
 An example of the usage of web-crawljs
