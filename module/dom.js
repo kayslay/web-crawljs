@@ -3,28 +3,15 @@
  */
 let cheerio = require('cheerio');
 let util = require('./util');
-module.exports = function (_priv) {
+module.exports = function (content) {
 
     //errors
     const KEY_ERROR = "the keys don't match. Make sure keys in arg1 matches keys in arg2";
 
-    /**
-     * @description gets the content on the page.
-     * @param selector {Object} contain the name of the data and a fetchSelector.
-     *        the name of data is the object key and the fetchSelector is the value
-     *        example: {name: 'li.col'}
-     * @param selectBy {Object} contain the name of the data and what to select in the class.
-     *        the name of data is the object key and the fetchSelector is the value
-     *        example: {name: 'text'}
-     *
-     *  NOTE: the keys in fetchSelector and fetchSelectBy
-     *@param callback
-     *@param url
-     *@private
-     */
+
     function getDomContents(selector, selectBy, callback, url) {
 
-        let $ = cheerio.load(_priv.content);
+        let $ = cheerio.load(content);
         //if the keys don't match
         if (!util.keyMatch(selector, selectBy) && callback) return callback(Error(`An Error Occurred : \n ${KEY_ERROR}`));
         //this doe nothing for now, since the there is always a callback passed to the getDomContents function
@@ -36,7 +23,7 @@ module.exports = function (_priv) {
         if (arguments.callee.caller.name == "selectNextCrawlContent") {
             relativeToAbsoluteUrl(contentData, url)
         }
-        callback(null, contentData,url);
+        callback(null, contentData, url);
 
         //return the data  if need
         return contentData;

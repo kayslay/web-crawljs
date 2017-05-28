@@ -22,9 +22,12 @@
   },
   "homepage": "https://github.com/www.github.com/kayslay#readme",
   "dependencies": {
-    "chai": "^3.5.0",
     "cheerio": "^0.22.0",
     "lodash": "^4.17.4",
     "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.4.1"
   }
 }
