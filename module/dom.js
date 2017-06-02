@@ -22,8 +22,10 @@ module.exports = function (content) {
 
         if (arguments.callee.caller.name == "selectNextCrawlContent") {
             relativeToAbsoluteUrl(contentData, url)
+            // content = null;
         }
-        callback(null, contentData, url);
+        callback && callback(null, contentData, url);
+
 
         //return the data  if need
         return contentData;
@@ -42,10 +44,9 @@ module.exports = function (content) {
         /**
          * @description returns an absolute url.
          * @param item
-         * @param index
          * @return {*}
          */
-        function returnAbsoluteUrl(item, index) {
+        function returnAbsoluteUrl(item) {
             if (/^(https?)/.test(item)) {
                 return item
             }

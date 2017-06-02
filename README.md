@@ -95,7 +95,7 @@ This function is called after each fetch operation on the page. The fetchFn take
 ### nextFn
 This function is called after getting the next links to crawl on the page have been scraped. Takes the same arguments as the fetchFn.
 
-### finalLoopFn
+### depthFn
 This is called at the end of the each iteration of the link
 
 ### finalFn
@@ -105,7 +105,7 @@ NOTE:: There is an issue with this function. If there all the links have been vi
 
 ## Other Properties
 
-### loop
+### depth
 The number of times crawl though the links in nextCrawlLinks.
 
 To understand what the loop property does, I would have to explain part of what goes on inside web-crawljs.

@@ -5,16 +5,6 @@ let _ = require('lodash');
 let path = require('path');
 let urlModule = require('url');
 
-/**
- * @description returns the item if its truthy or move the next and check again
- * @param  tests {String[]} the list of values
- */
-function trueOrNext(...tests) {
-    return tests.forEach((item, index) => {
-        "use strict";
-        if (item) return item;
-    })
-}
 
 /**
  * @description returns true if the keys of two objects match and false if otherwise
@@ -71,11 +61,33 @@ function sortDataToArray(data) {
     }, [])
 }
 
+//Todo: add what will reformat the urls, the selectBy e.t.c.
+
+function formatUrl(url) {
+    return url;
+}
+
+function dynamicSelection(url, dynamic, defaultSelection) {
+    "use strict";
+    //for now lets use a stringified url
+    if (dynamic) {
+        let formatedUrl = getUrlOut(url);
+        let selection = null;
+        for (let x of dynamic) {
+            if (x.url.test(formatedUrl)) {
+                return x.schema;
+            }
+        }
+    }
+    return defaultSelection
+}
+
 let util = {
-    trueOrNext,
     keyMatch,
     getUrlOut,
     sortDataToArray,
-    toAbsoluteUrl
+    toAbsoluteUrl,
+    formatUrl,
+    dynamicSelection
 };
 exports = module.exports = util;
