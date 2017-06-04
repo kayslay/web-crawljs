@@ -21,13 +21,14 @@ module.exports = function (content) {
         let contentData = sortIndividuallyByName(selector, selectBy, $);
 
         if (arguments.callee.caller.name == "selectNextCrawlContent") {
-            relativeToAbsoluteUrl(contentData, url)
+            relativeToAbsoluteUrl(contentData, url);
             // content = null;
         }
         callback && callback(null, contentData, url);
+        // de-referencing the callback function
+        callback = null;
 
-
-        //return the data  if need
+        //return the data  if needed
         return contentData;
     }
 

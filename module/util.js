@@ -25,7 +25,8 @@ function keyMatch(obj1, obj2) {
  * @return {string}
  */
 function toAbsoluteUrl(url, urlPath) {
-    let parsedUrl = urlModule.parse(url);
+    let getUrl = getUrlOut(url);
+    let parsedUrl = urlModule.parse(getUrl);
     return `${parsedUrl.protocol}//${parsedUrl.host}${path.resolve(url, urlPath)}${parsedUrl.search || ''}`
         .replace(/(\w|\d)\/\//g, "$1\/")
         .replace(/\/?#.+$/, '');
@@ -62,17 +63,28 @@ function sortDataToArray(data) {
 }
 
 //Todo: add what will reformat the urls, the selectBy e.t.c.
-
+/**
+ * @description returns a url; the url can either be a string or an Object supported by request package
+ * @param {String} url
+ * @return {String|Object}
+ */
 function formatUrl(url) {
     return url;
 }
 
+/**
+ *
+ * @param url
+ * @param {Object} dynamic the object that will replace the default selector
+ * @param {Object} defaultSelection the default selection
+ * @return {*}
+ */
 function dynamicSelection(url, dynamic, defaultSelection) {
     "use strict";
     //for now lets use a stringified url
+    //todo: fix the formating url
     if (dynamic) {
         let formatedUrl = getUrlOut(url);
-        let selection = null;
         for (let x of dynamic) {
             if (x.url.test(formatedUrl)) {
                 return x.schema;

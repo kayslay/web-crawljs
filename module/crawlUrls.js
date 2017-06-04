@@ -7,12 +7,14 @@ const dom = require('./dom');
 const _ = require('lodash');
 let getDomContents, visitedLinks = [];
 
+const getUrlOut = util.getUrlOut; //util.getUrlOut is used frequently; setting a const for its function
+
 let configured = false;
 
-let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy,
+let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl,
 
-    //set all defaultdynamicSchemas props when the variable reference is undefined
-    defaultdynamicSchemas = {
+    //set all defaultDynamicSchemas props when the variable reference is undefined
+    defaultDynamicSchemas = {
         fetchSelector, fetchSelectBy, nextSelector, nextSelectBy
     };
 
@@ -31,12 +33,12 @@ function crawlUrl(urls, resolve) {
 
     urls.forEach((url) => {
         "use strict";
-        if (visitedLinks.indexOf(url) === -1) { //Todo: improve the visitedLinks check
+        if (visitedLinks.indexOf(getUrlOut(url)) === -1) { //Todo: improve the visitedLinks check
             visitedUrls++;
-            visitedLinks.push(url);
+            visitedLinks.push(getUrlOut(url));
             req(url);
         } else {
-            console.log(`${url} has been visited`)
+            console.log(`${getUrlOut(url)} has been visited`)
         }
     });
 
@@ -54,28 +56,34 @@ function crawlUrl(urls, resolve) {
             visitedUrls--;
             getDomContents = dom(body).getDomContents; //
             scrapedData.push(fetchFromPage(url));
-            initialLink.push(selectNextCrawlContent(url));
-            //next after hook
+            let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)])).map(url => {
+                "use strict";
+                return formatUrl(url)
+            });
+            initialLink = initialLink.concat(newLink);
 
             if (visitedUrls == 0) {
-                resolve({fetchedData: scrapedData, nextLinks: _.uniq(util.sortDataToArray(initialLink))})
+                resolve({fetchedData: scrapedData, nextLinks: initialLink})
             }
         });
 
     }
 
 }
+
+
 //returns the scraped data gotten from the page
 function fetchFromPage(url) {
-    let selector = util.dynamicSelection(url, defaultdynamicSchemas.fetchSelector, fetchSelector);
-    let selectBy = util.dynamicSelection(url, defaultdynamicSchemas.fetchSelectBy, fetchSelectBy);
+    let selector = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelector, fetchSelector);
+    let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelectBy, fetchSelectBy);
 
     return getDomContents(selector, selectBy, fetchFn, url);
 }
+
 //get the url's to crawl next
 function selectNextCrawlContent(url) {
-    let selector = util.dynamicSelection(url, defaultdynamicSchemas.nextSelector, nextSelector);
-    let selectBy = util.dynamicSelection(url, defaultdynamicSchemas.nextSelectBy, nextSelectBy);
+    let selector = util.dynamicSelection(url, defaultDynamicSchemas.nextSelector, nextSelector);
+    let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.nextSelectBy, nextSelectBy);
     return getDomContents(selector, selectBy, nextFn, url);
 }
 
@@ -87,7 +95,7 @@ function selectNextCrawlContent(url) {
  */
 function crawlUrls(urls, config) {
     "use strict";
-    if(!configured) {
+    if (!configured) {
         let dynamicSchemas;  // define the variable to hold the dynamic data
         (function (config = {}) {
 
@@ -98,10 +106,10 @@ function crawlUrls(urls, config) {
                 nextSelectBy,
                 fetchFn,
                 nextFn,
-                dynamicSchemas={}
-
-            } = config)
-            Object.assign(defaultdynamicSchemas,dynamicSchemas)
+                dynamicSchemas={},
+                formatUrl = util.formatUrl
+            } = config);
+            Object.assign(defaultDynamicSchemas, dynamicSchemas)
         })(config);
         configured = true
     }
