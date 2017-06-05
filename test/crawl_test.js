@@ -10,16 +10,22 @@ let Crawler = require('../index')({
         // console.log(data.title[0],url)
         // require('fs').writeFile('./data.txt',data.body[0],(err,data)=>console.log('data written to data.txt'))
     },
+    formatUrl: function (url) {
+        if (url == 'http://localhost/dashboard/faq.html') {
+            return {url}
+        }
+        return url
+    },
 
     nextFn: function (err, data, url) {
-        // console.log(data)
+        // console.log(data,url)
     },
     dynamicSchemas: {
-        fetchSelector: [{url: 'http://localhost/dashboard/', schema: {title: "title"}}],
-        fetchSelectBy: [{url: 'http://localhost/dashboard/', schema: {title: "text"}}],
+        fetchSelector: [{url: /http:\/\/localhost\//, schema: {title: "title"}}],
+        fetchSelectBy: [{url: /http:\/\/localhost\//, schema: {title: "text"}}],
     },
     depthFn: function (data) {
-        console.log(data)
+        // console.log(data)
     },
     depth: 2,
     urls: ['http://localhost/dashboard/']

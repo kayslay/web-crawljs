@@ -29,14 +29,18 @@ function createCrawler(config = {}) {
     })(config);
 
     function crawl() {
-        crawlUrls(nextLinks, config)
-            .then(scrapedData => {
-                depthFn(scrapedData.fetchedData);
-                gen.next(scrapedData.nextLinks);
-            })
-            .catch(err => {
-                throw new Error(err.message)
-            })
+        try {
+            crawlUrls(nextLinks, config)
+                .then(scrapedData => {
+                    depthFn(scrapedData.fetchedData);
+                    gen.next(scrapedData.nextLinks);
+                })
+                .catch(err => {
+                    console.error(err)
+                })
+        }catch (err){
+            console.log(err)
+        }
     }
 
 
