@@ -8,12 +8,13 @@ function createCrawler(config = {}) {
 
     let urls, finalFn, depthFn, depth;
 
+    //
     function defaultLoopFn(data) {
-        console.log("end of each loop")
+        console.log("---depth---")
     }
 
     function defaultFinalFn() {
-        console.log('end...')
+        console.log('---final---')
     }
 
 
@@ -28,26 +29,30 @@ function createCrawler(config = {}) {
         nextLinks = nextLinks.concat(urls);
     })(config);
 
+    /**
+     * @description
+     */
     function crawl() {
-        try {
+
             crawlUrls(nextLinks, config)
                 .then(scrapedData => {
                     depthFn(scrapedData.fetchedData);
                     gen.next(scrapedData.nextLinks);
                 })
                 .catch(err => {
-                    console.error(err)
-                })
-        }catch (err){
-            console.log(err)
-        }
+                    gen.next({err})
+                });
+
     }
 
 
     function* crawlGen() {
         for (let i = 0; i < depth; i++) {
             nextLinks = yield crawl();
-            // console.log(nextLinks)
+            if(nextLinks.err){
+                console.error(nextLinks.err);
+                break;
+            }
         }
         finalFn()
     }

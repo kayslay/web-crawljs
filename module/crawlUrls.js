@@ -52,15 +52,18 @@ function crawlUrl(urls, resolve) {
     function req(url) {
 
         request(url, function (err, response, body) {
-            if (err) return console.log(err.message);
             visitedUrls--;
-            getDomContents = dom(body).getDomContents; //
-            scrapedData.push(fetchFromPage(url));
-            let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)])).map(url => {
-                "use strict";
-                return formatUrl(url)
-            });
-            initialLink = initialLink.concat(newLink);
+            if (err) {
+                console.error(err.message);
+            } else {
+                getDomContents = dom(body).getDomContents; //
+                scrapedData.push(fetchFromPage(url));
+                let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)])).map(url => {
+                    "use strict";
+                    return formatUrl(url)
+                });
+                initialLink = initialLink.concat(newLink);
+            }
 
             if (visitedUrls == 0) {
                 resolve({fetchedData: scrapedData, nextLinks: initialLink})

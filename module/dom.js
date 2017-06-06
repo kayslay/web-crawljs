@@ -8,7 +8,14 @@ module.exports = function (content) {
     //errors
     const KEY_ERROR = "the keys don't match. Make sure keys in arg1 matches keys in arg2";
 
-
+    /**
+     * @description returns back the Dom content from the page's body
+     * @param selector
+     * @param selectBy
+     * @param callback
+     * @param url
+     * @return {*}
+     */
     function getDomContents(selector, selectBy, callback, url) {
 
         let $ = cheerio.load(content);
@@ -57,7 +64,7 @@ module.exports = function (content) {
 
 
     /**
-     *
+     * @description extracts the data by the name given to the seector Object keys.
      * @param selector
      * @param selectBy
      * @param $

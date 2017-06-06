@@ -62,7 +62,6 @@ function sortDataToArray(data) {
     }, [])
 }
 
-//Todo: add what will reformat the urls, the selectBy e.t.c.
 /**
  * @description returns a url; the url can either be a string or an Object supported by request package
  * @param {String} url
