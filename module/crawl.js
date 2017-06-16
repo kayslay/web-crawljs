@@ -53,6 +53,10 @@ function createCrawler(config = {}) {
                 console.error(nextLinks.err);
                 break;
             }
+            if(nextLinks.length == 0){
+                console.log('nextLinks array empty');
+                break
+            }
         }
         finalFn()
     }
