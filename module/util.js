@@ -93,12 +93,38 @@ function dynamicSelection(url, dynamic, defaultSelection) {
     return defaultSelection
 }
 
+
+/**
+ * @description changes the relative urls to
+ * @param contentData
+ * @param url
+ */
+function relativeToAbsoluteUrl(contentData, url) {
+    for (let name in contentData) {
+        contentData[name] = contentData[name].map(returnAbsoluteUrl)
+    }
+
+    /**
+     * @description returns an absolute url.
+     * @param item
+     * @return {*}
+     */
+    function returnAbsoluteUrl(item) {
+        if (/^(https?)/.test(item)) {
+            return item
+        }
+        return util.toAbsoluteUrl(url, item)
+    }
+}
+
+
 let util = {
     keyMatch,
     getUrlOut,
     sortDataToArray,
     toAbsoluteUrl,
     formatUrl,
-    dynamicSelection
+    dynamicSelection,
+    relativeToAbsoluteUrl
 };
 exports = module.exports = util;

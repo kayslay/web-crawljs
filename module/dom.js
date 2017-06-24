@@ -23,12 +23,11 @@ module.exports = function (content) {
         if (!util.keyMatch(selector, selectBy) && callback) return callback(Error(`An Error Occurred : \n ${KEY_ERROR}`));
         //this doe nothing for now, since the there is always a callback passed to the getDomContents function
         else if (!util.keyMatch(selector, selectBy)) throw  new Error(`An Error Occurred: \n ${KEY_ERROR}`);
-
         //sets the contentData based on the way the data s organized;
         let contentData = sortIndividuallyByName(selector, selectBy, $);
 
         if (arguments.callee.caller.name == "selectNextCrawlContent") {
-            relativeToAbsoluteUrl(contentData, url);
+            util.relativeToAbsoluteUrl(contentData, url);
             // content = null;
         }
         callback && callback(null, contentData, url);
@@ -38,30 +37,6 @@ module.exports = function (content) {
         //return the data  if needed
         return contentData;
     }
-
-    /**
-     * @description changes the relative urls to
-     * @param contentData
-     * @param url
-     */
-    function relativeToAbsoluteUrl(contentData, url) {
-        for (let name in contentData) {
-            contentData[name] = contentData[name].map(returnAbsoluteUrl)
-        }
-
-        /**
-         * @description returns an absolute url.
-         * @param item
-         * @return {*}
-         */
-        function returnAbsoluteUrl(item) {
-            if (/^(https?)/.test(item)) {
-                return item
-            }
-            return util.toAbsoluteUrl(url, item)
-        }
-    }
-
 
     /**
      * @description extracts the data by the name given to the seector Object keys.
