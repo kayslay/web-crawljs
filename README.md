@@ -173,3 +173,8 @@ config ={
 ```
 Note : Not all the keys in the dynamicSchema must be defined, but the (fetch|next)Selector and the (fetch|next)SelectBy schema keys must match for.
 
+### timeOut
+This property sets the timeout for getting the response of an iteration of a crawl.
+
+### limitNextLinks
+This property limits the amount of links that will be returned to be crawled. If `limitNextLinks` is greater than the default nextLinks length, it won't be used.

@@ -6,7 +6,7 @@ function createCrawler(config = {}) {
     let nextLinks = [];
     let gen;
 
-    let urls, finalFn, depthFn, depth;
+    let urls, finalFn, depthFn, depth, limitNextLinks;
 
     //
     function defaultLoopFn(data) {
@@ -24,7 +24,8 @@ function createCrawler(config = {}) {
             urls = [],
             finalFn= defaultFinalFn,
             depthFn= defaultLoopFn,
-            depth=1
+            depth=1,
+            limitNextLinks
         } = config);
         nextLinks = nextLinks.concat(urls);
     })(config);
@@ -34,14 +35,14 @@ function createCrawler(config = {}) {
      */
     function crawl() {
 
-            crawlUrls(nextLinks, config)
-                .then(scrapedData => {
-                    depthFn(scrapedData.fetchedData);
-                    gen.next(scrapedData.nextLinks);
-                })
-                .catch(err => {
-                    gen.next({err})
-                });
+        crawlUrls(nextLinks, config)
+            .then(scrapedData => {
+                depthFn(scrapedData.fetchedData);
+                gen.next(scrapedData.nextLinks);
+            })
+            .catch(err => {
+                gen.next({err})
+            });
 
     }
 
@@ -49,13 +50,16 @@ function createCrawler(config = {}) {
     function* crawlGen() {
         for (let i = 0; i < depth; i++) {
             nextLinks = yield crawl();
-            if(nextLinks.err){
+            if (nextLinks.err) {
                 console.error(nextLinks.err);
                 break;
             }
-            if(nextLinks.length == 0){
+            if (nextLinks.length == 0) {
                 console.log('nextLinks array empty');
                 break
+            }
+            if (limitNextLinks) {//limit the amount of links returned
+                nextLinks = nextLinks.slice(0, Math.min(limitNextLinks, nextLinks.length))
             }
         }
         finalFn()

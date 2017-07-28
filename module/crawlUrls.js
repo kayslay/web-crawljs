@@ -25,7 +25,7 @@ let fetchFn, nextFn;
  * @param urls
  * @param resolve
  */
-function crawlUrl(urls, resolve) {
+function crawlUrl(urls, resolve,reject) {
     let visitedUrls = 0;
     let initialLink = [];
     let scrapedData = [];
@@ -41,6 +41,10 @@ function crawlUrl(urls, resolve) {
             console.log(`${getUrlOut(url)} has been visited`)
         }
     });
+
+    if (visitedUrls == 0) {//if visited links is 0 it means it
+       reject("all the links have been visited")
+    }
 
 
     /**
@@ -122,7 +126,7 @@ function crawlUrls(urls, config) {
         if (timeOut) {
             setTimeout(() => reject(`timeout after ${timeOut}ms`), timeOut)
         }
-        return crawlUrl(urls, resolve)
+        return crawlUrl(urls, resolve,reject)
     })
 }
 
