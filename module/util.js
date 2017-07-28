@@ -72,7 +72,7 @@ function formatUrl(url) {
 }
 
 /**
- *
+ * @description returns the selector that would be used to crawl the page.
  * @param url
  * @param {Object} dynamic the object that will replace the default selector
  * @param {Object} defaultSelection the default selection
@@ -80,12 +80,10 @@ function formatUrl(url) {
  */
 function dynamicSelection(url, dynamic, defaultSelection) {
     "use strict";
-    //for now lets use a stringified url
-    //todo: fix the formating url
     if (dynamic) {
-        let formatedUrl = getUrlOut(url);
+        let formattedUrl = getUrlOut(url);
         for (let x of dynamic) {
-            if (x.url.test(formatedUrl)) {
+            if (x.url.test(formattedUrl)) {
                 return x.schema;
             }
         }

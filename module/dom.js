@@ -39,7 +39,7 @@ module.exports = function (content) {
     }
 
     /**
-     * @description extracts the data by the name given to the seector Object keys.
+     * @description extracts the data by the name given to the selector Object keys.
      * @param selector
      * @param selectBy
      * @param $

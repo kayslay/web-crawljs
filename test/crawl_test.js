@@ -24,6 +24,7 @@ let Crawler = require('../index')({
     nextFn: function (err, data, url) {
         // console.log(data,url)
     },
+    timeOut: 100,
     dynamicSchemas: {
         //when the url matches https://en.wikipedia.org it uses this schema to format it
         fetchSelector: [{url: /https:\/\/en.wikipedia.org/, schema: {title: "title", body: "div#mw-content-text"}}],

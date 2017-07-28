@@ -10,12 +10,12 @@ let getDomContents, visitedLinks = [];
 const getUrlOut = util.getUrlOut; //util.getUrlOut is used frequently; setting a const for its function
 
 let configured = false;
-
-let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl,
+//the variables to be configured
+let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false,
 
     //set all defaultDynamicSchemas props when the variable reference is undefined
     defaultDynamicSchemas = {
-        fetchSelector, fetchSelectBy, nextSelector, nextSelectBy
+        fetchSelector: undefined, fetchSelectBy: undefined, nextSelector: undefined, nextSelectBy: undefined
     };
 
 let fetchFn, nextFn;
@@ -109,6 +109,7 @@ function crawlUrls(urls, config) {
                 nextSelectBy,
                 fetchFn,
                 nextFn,
+                timeOut,
                 dynamicSchemas={},
                 formatUrl = util.formatUrl
             } = config);
@@ -117,7 +118,12 @@ function crawlUrls(urls, config) {
         configured = true
     }
 
-    return new Promise((resolve, reject) => crawlUrl(urls, resolve))
+    return new Promise((resolve, reject) => {
+        if (timeOut) {
+            setTimeout(() => reject(`timeout after ${timeOut}ms`), timeOut)
+        }
+        return crawlUrl(urls, resolve)
+    })
 }
 
 
