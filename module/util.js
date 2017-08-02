@@ -87,6 +87,7 @@ function dynamicSelection(url, dynamic, defaultSelection) {
                 return x.schema;
             }
         }
+        return defaultSelection
     }
     return defaultSelection
 }
