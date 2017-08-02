@@ -62,10 +62,9 @@ function crawlUrl(urls, resolve,reject) {
             } else {
                 getDomContents = dom(body).getDomContents; //
                 scrapedData.push(fetchFromPage(url));
-                let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)])).map(url => {
-                    "use strict";
+                let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)]).map(url => {
                     return formatUrl(url)
-                });
+                }));
                 initialLink = initialLink.concat(newLink);
             }
 
