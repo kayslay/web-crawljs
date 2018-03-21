@@ -6,16 +6,24 @@ const util = require('./util');
 const dom = require('./dom');
 const _ = require('lodash');
 let getDomContents, visitedLinks = [];
+let gen;
+
+function KEY_ERROR(arg1, arg2) {
+    return `the keys don't match. Make sure keys in ${arg1} matches keys in ${arg2}`
+}
 
 const getUrlOut = util.getUrlOut; //util.getUrlOut is used frequently; setting a const for its function
 
 let configured = false;
 //the variables to be configured
-let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false,
+let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false, group, rateLimit,
 
     //set all defaultDynamicSchemas props when the variable reference is undefined
     defaultDynamicSchemas = {
-        fetchSelector: undefined, fetchSelectBy: undefined, nextSelector: undefined, nextSelectBy: undefined
+        fetchSelector: undefined,
+        fetchSelectBy: undefined,
+        nextSelector: undefined,
+        nextSelectBy: undefined
     };
 
 let fetchFn, nextFn;
@@ -25,25 +33,30 @@ let fetchFn, nextFn;
  * @param urls
  * @param resolve
  */
-function crawlUrl(urls, resolve,reject) {
+function* crawlUrl(urls, resolve, reject) {
     let visitedUrls = 0;
     let initialLink = [];
     let scrapedData = [];
-    if (!Array.isArray(urls)) throw  new Error('the property urls must be an Array');
+    if (!Array.isArray(urls)) throw new Error('the property urls must be an Array');
 
-    urls.forEach((url) => {
-        "use strict";
+    for (let url of urls){
+        
         if (visitedLinks.indexOf(getUrlOut(url)) === -1) { //Todo: improve the visitedLinks check
             visitedUrls++;
+              if (rateLimit){
+                yield new Promise((r,x)=> setTimeout(args=>{
+                    gen.next()
+                },rateLimit))
+            }
             visitedLinks.push(getUrlOut(url));
             req(url);
         } else {
             console.log(`${getUrlOut(url)} has been visited`)
         }
-    });
+    }
 
-    if (visitedUrls == 0) {//if visited links is 0 it means it
-       reject("all the links have been visited")
+    if (visitedUrls == 0) { //if visited links is 0 it means it
+        reject("All the links have been visited")
     }
 
 
@@ -58,8 +71,10 @@ function crawlUrl(urls, resolve,reject) {
         request(url, function (err, response, body) {
             visitedUrls--;
             if (err) {
+                //todo: conext kill
                 console.error(err.message);
             } else {
+                //Todo: context kill
                 getDomContents = dom(body).getDomContents; //
                 scrapedData.push(fetchFromPage(url));
                 let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)]).map(url => {
@@ -69,7 +84,11 @@ function crawlUrl(urls, resolve,reject) {
             }
 
             if (visitedUrls == 0) {
-                resolve({fetchedData: scrapedData, nextLinks: initialLink})
+                console.log("resolved")
+                resolve({
+                    fetchedData: scrapedData,
+                    nextLinks: initialLink
+                })
             }
         });
 
@@ -83,7 +102,7 @@ function fetchFromPage(url) {
     let selector = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelector, fetchSelector);
     let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelectBy, fetchSelectBy);
 
-    return getDomContents(selector, selectBy, fetchFn, url);
+    return getDomContents(selector, selectBy, fetchFn, url,group);
 }
 
 //get the url's to crawl next
@@ -93,16 +112,33 @@ function selectNextCrawlContent(url) {
     return getDomContents(selector, selectBy, nextFn, url);
 }
 
+function configSectors() {
+
+    Object.entries(fetchSelector).forEach(selector => {
+        if (selector[1]._group) {
+            if (!dom.groupObj[selector[1]._group]) {
+                dom.groupObj[selector[1]._group] = []
+            }
+            dom.groupObj[selector[1]._group].push({[selector[0]]:selector[1]._selector})
+            delete fetchSelector[selector[0]]
+        }
+    })
+
+    if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new Error(`An Error Occurred:  ${KEY_ERROR("fetchSelector","fetchSelectBy")}`);
+    if (!util.keyMatch(nextSelector, nextSelectBy)) throw new Error(`An Error Occurred: ${KEY_ERROR("nextSelector","nextSelectBy")}`);
+
+}
+
 /**
  *
  * @param urls
  * @param config
  * @return {Promise}
  */
-function crawlUrls(urls, config) {
-    "use strict";
+function initCrawl(urls, config) {
+    
     if (!configured) {
-        let dynamicSchemas;  // define the variable to hold the dynamic data
+        let dynamicSchemas; // define the variable to hold the dynamic data
         (function (config = {}) {
 
             ({
@@ -113,10 +149,15 @@ function crawlUrls(urls, config) {
                 fetchFn,
                 nextFn,
                 timeOut,
-                dynamicSchemas={},
+                group,
+                rateLimit=0,
+                dynamicSchemas = {},
                 formatUrl = util.formatUrl
             } = config);
+            configSectors()
+            console.log(dom.groupObj)
             Object.assign(defaultDynamicSchemas, dynamicSchemas)
+
         })(config);
         configured = true
     }
@@ -125,9 +166,13 @@ function crawlUrls(urls, config) {
         if (timeOut) {
             setTimeout(() => reject(`timeout after ${timeOut}ms`), timeOut)
         }
-        return crawlUrl(urls, resolve,reject)
+        gen = crawlUrl(urls, resolve, reject)
+        gen.next()
+        return gen
     })
 }
 
 
-module.exports = {crawlUrls};
+module.exports = {
+    initCrawl
+};
