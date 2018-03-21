@@ -1,12 +1,16 @@
 /**
  * Created by kayslay on 5/28/17.
  */
-const {crawlUrls} = require('./crawlUrls');
+const _ = require("lodash")
+const {
+    initCrawl
+} = require('./crawlUrls');
+
 function createCrawler(config = {}) {
     let nextLinks = [];
     let gen;
 
-    let urls, finalFn, depthFn, depth, limitNextLinks;
+    let urls, finalFn, depthFn, depth, limitNextLinks, nextCrawlWait;
 
     //
     function defaultLoopFn(data) {
@@ -22,10 +26,11 @@ function createCrawler(config = {}) {
     (function (config = {}) {
         ({
             urls = [],
-            finalFn= defaultFinalFn,
-            depthFn= defaultLoopFn,
-            depth=1,
-            limitNextLinks
+            finalFn = defaultFinalFn,
+            depthFn = defaultLoopFn,
+            depth = 1,
+            limitNextLinks,
+            nextCrawlWait = 0, //rate limit in what
         } = config);
         nextLinks = nextLinks.concat(urls);
     })(config);
@@ -35,13 +40,15 @@ function createCrawler(config = {}) {
      */
     function crawl() {
 
-        crawlUrls(nextLinks, config)
+        initCrawl(nextLinks, config)
             .then(scrapedData => {
-                depthFn(scrapedData.fetchedData);
-                gen.next(scrapedData.nextLinks);
+                depthFn(_.cloneDeep(scrapedData.fetchedData));
+                gen.next(_.cloneDeep(scrapedData.nextLinks));
             })
             .catch(err => {
-                gen.next({err})
+                gen.next({
+                    err
+                })
             });
 
     }
@@ -51,21 +58,29 @@ function createCrawler(config = {}) {
         for (let i = 0; i < depth; i++) {
             nextLinks = yield crawl();
             if (nextLinks.err) {
-                console.error(nextLinks.err);
+                console.log(nextLinks.err);
                 break;
             }
             if (nextLinks.length == 0) {
                 console.log('nextLinks array empty');
                 break
             }
-            if (limitNextLinks) {//limit the amount of links returned
+            //wait
+            if (nextCrawlWait) {
+                yield new Promise((r, x) => setTimeout(args => {
+                    gen.next()
+                }, nextCrawlWait))
+            }
+            //limit the links return
+            if (limitNextLinks) { //limit the amount of links returned
                 nextLinks = nextLinks.slice(0, Math.min(limitNextLinks, nextLinks.length))
             }
         }
+        nextLinks = null
         finalFn()
     }
 
-    function CrawlAllUrl() {
+    function CrawlAllUrl(errFn) {
         gen = crawlGen();
         gen.next();
     }
