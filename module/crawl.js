@@ -54,11 +54,11 @@ function createCrawler(config = {}) {
     }
 
 
-    function* crawlGen() {
+    function* crawlGen(resolve,reject) {
         for (let i = 0; i < depth; i++) {
             nextLinks = yield crawl();
             if (nextLinks.err) {
-                console.log(nextLinks.err);
+                reject(nextLinks.err);
                 break;
             }
             if (nextLinks.length == 0) {
@@ -77,12 +77,16 @@ function createCrawler(config = {}) {
             }
         }
         nextLinks = null
-        finalFn()
+        resolve()
     }
 
-    function CrawlAllUrl(errFn) {
-        gen = crawlGen();
+    function CrawlAllUrl() {
+       return new Promise((resolve,reject)=>{
+             gen = crawlGen(resolve,reject);
         gen.next();
+        return gen
+       }).then(()=>finalFn())
+       .catch(err=>finalFn(err))
     }
 
     return {
