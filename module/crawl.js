@@ -2,11 +2,13 @@
  * Created by kayslay on 5/28/17.
  */
 const _ = require("lodash")
-const {
-    initCrawl
-} = require('./crawlUrls');
+const crawlUrls= require('./crawlUrls')
 
 function createCrawler(config = {}) {
+    const {
+        initCrawl
+    } = crawlUrls()
+
     let nextLinks = [];
     let gen;
 
