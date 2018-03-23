@@ -84,7 +84,6 @@ function* crawlUrl(urls, resolve, reject) {
             }
 
             if (visitedUrls == 0) {
-                console.log("resolved")
                 resolve({
                     fetchedData: scrapedData,
                     nextLinks: initialLink
@@ -112,8 +111,10 @@ function selectNextCrawlContent(url) {
     return getDomContents(selector, selectBy, nextFn, url);
 }
 
-function configSectors() {
-
+/**
+ * @description configures the 
+ */
+function configSelectors() {
     Object.entries(fetchSelector).forEach(selector => {
         if (selector[1]._group) {
             if (!dom.groupObj[selector[1]._group]) {
@@ -154,7 +155,7 @@ function initCrawl(urls, config) {
                 dynamicSchemas = {},
                 formatUrl = util.formatUrl
             } = config);
-            configSectors()
+            configSelectors()
             console.log(dom.groupObj)
             Object.assign(defaultDynamicSchemas, dynamicSchemas)
 
