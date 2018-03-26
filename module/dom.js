@@ -70,7 +70,6 @@ module.exports = function (content) {
                             } else if (typeof $$[selectBy[data]] !== 'undefined') {
                                 return $$(this)[selectBy[data]] || "null";
                             }
-
                         }).get()
                     }
                     contentData[key].push(obj)
