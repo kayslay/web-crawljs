@@ -119,6 +119,9 @@ module.exports = function () {
      * @description configures the 
      */
     function configSelectors() {
+        if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new Error(`An Error Occurred:  ${KEY_ERROR("fetchSelector","fetchSelectBy")}`);
+        if (!util.keyMatch(nextSelector, nextSelectBy)) throw new Error(`An Error Occurred: ${KEY_ERROR("nextSelector","nextSelectBy")}`);
+
         Object.entries(fetchSelector).forEach(selector => {
             if (selector[1]._group) {
                 if (!_groupSet[selector[1]._group]) {
@@ -128,9 +131,6 @@ module.exports = function () {
                 delete fetchSelector[selector[0]]
             }
         })
-
-        if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new Error(`An Error Occurred:  ${KEY_ERROR("fetchSelector","fetchSelectBy")}`);
-        if (!util.keyMatch(nextSelector, nextSelectBy)) throw new Error(`An Error Occurred: ${KEY_ERROR("nextSelector","nextSelectBy")}`);
 
     }
 
