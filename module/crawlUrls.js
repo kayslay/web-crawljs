@@ -55,7 +55,7 @@ module.exports = function () {
                 visitedLinks.push(getUrlOut(url));
                 req(url);
             } else {
-                console.log(`${getUrlOut(url)} has been visited`)
+                console.log(`${(new Date())} INFO ${getUrlOut(url)} has been visited`)
             }
         }
 
@@ -76,7 +76,7 @@ module.exports = function () {
                 visitedUrls--;
                 if (err) {
                     //todo: conext kill
-                    console.error(err.message);
+                    console.error(`${(new Date())} ERROR ${err.message}`);
                 } else {
                     //Todo: context kill
                     getDomContents = dom(body).getDomContents; //
