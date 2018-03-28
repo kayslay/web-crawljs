@@ -16,11 +16,11 @@ function createCrawler(config = {}) {
 
     //
     function defaultLoopFn(data) {
-        console.log("---depth---")
+       // console.log("---depthFn called---")
     }
 
     function defaultFinalFn() {
-        console.log('---final---')
+        // console.log('---finalFn called---')
     }
 
 
@@ -64,7 +64,7 @@ function createCrawler(config = {}) {
                 break;
             }
             if (nextLinks.length == 0) {
-                console.log('nextLinks array empty');
+                // console.log('nextLinks array empty; crawl ending');
                 break
             }
             //wait

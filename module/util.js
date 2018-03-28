@@ -14,7 +14,7 @@ let urlModule = require('url');
  */
 function keyMatch(obj1, obj2) {
     let key1 = Object.keys(obj1).sort();
-    let key2 = Object.keys(obj2).sort();
+    let key2 = Object.keys(obj2).filter(k=> (key1.indexOf(k) != -1)).sort();
     return _.isEqual(key1, key2);
 }
 
@@ -53,7 +53,7 @@ function getUrlOut(url) {
  */
 function sortDataToArray(data) {
     return data.reduce((acc, item) => {
-        "use strict";
+        
         let packedItem = [];
         for (let i in item) {
             packedItem = packedItem.concat(item[i]);
@@ -79,7 +79,7 @@ function formatUrl(url) {
  * @return {*}
  */
 function dynamicSelection(url, dynamic, defaultSelection) {
-    "use strict";
+    
     if (dynamic) {
         let formattedUrl = getUrlOut(url);
         for (let x of dynamic) {
@@ -92,6 +92,12 @@ function dynamicSelection(url, dynamic, defaultSelection) {
     return defaultSelection
 }
 
+function empty(obj){
+    for (let i in obj){
+        return false
+    }
+    return true
+}
 
 /**
  * @description changes the relative urls to
@@ -124,6 +130,7 @@ let util = {
     toAbsoluteUrl,
     formatUrl,
     dynamicSelection,
-    relativeToAbsoluteUrl
+    relativeToAbsoluteUrl,
+    empty
 };
 exports = module.exports = util;
