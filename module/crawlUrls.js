@@ -5,14 +5,8 @@ const request = require('request');
 const util = require('./util');
 const dom = require('./dom');
 const _ = require('lodash');
-
-
-
-function KEY_ERROR(arg1, arg2) {
-    return `the keys don't match. Make sure keys in ${arg1} matches keys in ${arg2}`
-}
-
-const getUrlOut = util.getUrlOut; //util.getUrlOut is used frequently; setting a const for its function
+const {TimeoutErr,AllLinksVisitErr,KeyMatchErr} = require("./errors")
+const {genUniqueVisitedString} = util;
 
 module.exports = function () {
     let gen, visitedLinks = [],
@@ -21,7 +15,6 @@ module.exports = function () {
     //the variables to be configured
     let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false,
         groups, _groupSet ={}, rateLimit,
-
         //set all defaultDynamicSchemas props when the variable reference is undefined
         defaultDynamicSchemas = {
             fetchSelector: undefined,
@@ -33,9 +26,11 @@ module.exports = function () {
     let fetchFn, nextFn;
 
     /**
-     *
-     * @param urls
-     * @param resolve
+     * @description visit and crawls all the urls @argument {urls}. It resolves a Promise
+     *  or rejects the promise depending on success or error
+     * @param {String[]|{url,method,FormData,multipart}[]} urls an array containing the urls to visit next
+     * @param {Function} resolve Promise.resole
+     * @param {Function} reject Promise.reject
      */
     function* crawlUrl(urls, resolve, reject) {
         let visitedUrls = 0;
@@ -45,22 +40,22 @@ module.exports = function () {
 
         for (let url of urls) {
 
-            if (visitedLinks.indexOf(getUrlOut(url)) === -1) { //Todo: improve the visitedLinks check
+            if (visitedLinks.indexOf(genUniqueVisitedString(url)) === -1) { //Todo: improve the visitedLinks check
                 visitedUrls++;
                 if (rateLimit) {
                     yield new Promise((resolve, reject) => setTimeout(args => {
                         gen.next()
                     }, rateLimit))
                 }
-                visitedLinks.push(getUrlOut(url));
+                visitedLinks.push(genUniqueVisitedString(url));
                 req(url);
             } else {
-                console.log(`${(new Date())} INFO ${getUrlOut(url)} has been visited`)
+                console.info(`${(new Date())} INFO ${genUniqueVisitedString(url)} has been visited`)
             }
         }
 
-        if (visitedUrls == 0) { //if visited links is 0 it means it
-            reject("All the links have been visited")
+        if (visitedUrls == 0) { //if visited links is 0 it means it there is no more link to crawl. Fail.
+            reject(new AllLinksVisitErr())
         }
 
 
@@ -75,7 +70,7 @@ module.exports = function () {
             request(url, function (err, response, body) {
                 visitedUrls--;
                 if (err) {
-                    //todo: conext kill
+                    //todo: context kill
                     console.error(`${(new Date())} ERROR ${err.message}`);
                 } else {
                     //Todo: context kill
@@ -119,8 +114,8 @@ module.exports = function () {
      * @description configures the 
      */
     function configSelectors() {
-        if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new Error(`An Error Occurred:  ${KEY_ERROR("fetchSelector","fetchSelectBy")}`);
-        if (!util.keyMatch(nextSelector, nextSelectBy)) throw new Error(`An Error Occurred: ${KEY_ERROR("nextSelector","nextSelectBy")}`);
+        if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new KeyMatchErr("fetchSelector","fetchSelectBy");
+        if (!util.keyMatch(nextSelector, nextSelectBy)) throw new KeyMatchErr("nextSelector","nextSelectBy");
 
         Object.entries(fetchSelector).forEach(selector => {
             if (selector[1]._group) {
@@ -168,7 +163,7 @@ module.exports = function () {
 
         return new Promise((resolve, reject) => {
             if (timeOut) {
-                setTimeout(() => reject(`timeout after ${timeOut}ms`), timeOut)
+                setTimeout(() => reject(new TimeoutErr(timeOut)), timeOut)
             }
             gen = crawlUrl(urls, resolve, reject)
             gen.next()
