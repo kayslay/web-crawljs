@@ -1,20 +1,26 @@
 /**
  * Created by kayslay on 5/28/17.
  */
-const {crawlUrls} = require('./crawlUrls');
+const _ = require("lodash")
+const crawlUrls= require('./crawlUrls')
+
 function createCrawler(config = {}) {
+    const {
+        initCrawl
+    } = crawlUrls()
+
     let nextLinks = [];
     let gen;
 
-    let urls, finalFn, depthFn, depth, limitNextLinks;
+    let urls, finalFn, depthFn, depth, limitNextLinks, nextCrawlWait;
 
     //
     function defaultLoopFn(data) {
-        console.log("---depth---")
+       // console.log("---depthFn called---")
     }
 
     function defaultFinalFn() {
-        console.log('---final---')
+        // console.log('---finalFn called---')
     }
 
 
@@ -22,10 +28,11 @@ function createCrawler(config = {}) {
     (function (config = {}) {
         ({
             urls = [],
-            finalFn= defaultFinalFn,
-            depthFn= defaultLoopFn,
-            depth=1,
-            limitNextLinks
+            finalFn = defaultFinalFn,
+            depthFn = defaultLoopFn,
+            depth = 1,
+            limitNextLinks,
+            nextCrawlWait = 0, //rate limit in what
         } = config);
         nextLinks = nextLinks.concat(urls);
     })(config);
@@ -35,39 +42,53 @@ function createCrawler(config = {}) {
      */
     function crawl() {
 
-        crawlUrls(nextLinks, config)
+        initCrawl(nextLinks, config)
             .then(scrapedData => {
-                depthFn(scrapedData.fetchedData);
-                gen.next(scrapedData.nextLinks);
+                depthFn(_.cloneDeep(scrapedData.fetchedData));
+                gen.next(_.cloneDeep(scrapedData.nextLinks));
             })
             .catch(err => {
-                gen.next({err})
+                gen.next({
+                    err
+                })
             });
 
     }
 
 
-    function* crawlGen() {
+    function* crawlGen(resolve,reject) {
         for (let i = 0; i < depth; i++) {
             nextLinks = yield crawl();
             if (nextLinks.err) {
-                console.error(nextLinks.err);
+                reject(nextLinks.err);
                 break;
             }
             if (nextLinks.length == 0) {
-                console.log('nextLinks array empty');
+                // console.log('nextLinks array empty; crawl ending');
                 break
             }
-            if (limitNextLinks) {//limit the amount of links returned
+            //wait
+            if (nextCrawlWait) {
+                yield new Promise((r, x) => setTimeout(args => {
+                    gen.next()
+                }, nextCrawlWait))
+            }
+            //limit the links return
+            if (limitNextLinks) { //limit the amount of links returned
                 nextLinks = nextLinks.slice(0, Math.min(limitNextLinks, nextLinks.length))
             }
         }
-        finalFn()
+        nextLinks = null
+        resolve()
     }
 
     function CrawlAllUrl() {
-        gen = crawlGen();
+       return new Promise((resolve,reject)=>{
+             gen = crawlGen(resolve,reject);
         gen.next();
+        return gen
+       }).then(()=>finalFn())
+       .catch(err=>finalFn(err))
     }
 
     return {
