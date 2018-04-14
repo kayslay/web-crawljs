@@ -14,7 +14,7 @@ let urlModule = require('url');
  */
 function keyMatch(obj1, obj2) {
     let key1 = Object.keys(obj1).sort();
-    let key2 = Object.keys(obj2).filter(k=> (key1.indexOf(k) != -1)).sort();
+    let key2 = Object.keys(obj2).sort();
     return _.isEqual(key1, key2);
 }
 
@@ -27,7 +27,7 @@ function keyMatch(obj1, obj2) {
 function toAbsoluteUrl(url, urlPath) {
     let getUrl = getUrlOut(url);
     let parsedUrl = urlModule.parse(getUrl);
-    return `${parsedUrl.protocol}//${parsedUrl.host}${path.resolve(url, urlPath)}${parsedUrl.search || ''}`
+    return `${parsedUrl.protocol}//${parsedUrl.host}${path.join(parsedUrl.pathname, urlPath)}${parsedUrl.search || ''}`
         .replace(/(\w|\d)\/\//g, "$1\/")
         .replace(/\/?#.+$/, '');
 }
@@ -110,7 +110,7 @@ function empty(obj){
 }
 
 /**
- * @description changes the relative urls to
+ * @description changes the relative urls to absolute urls
  * @param contentData
  * @param url
  */
@@ -119,11 +119,6 @@ function relativeToAbsoluteUrl(contentData, url) {
         contentData[name] = contentData[name].map(returnAbsoluteUrl)
     }
 
-    /**
-     * @description returns an absolute url.
-     * @param item
-     * @return {*}
-     */
     function returnAbsoluteUrl(item) {
         if (/^(https?)/.test(item)) {
             return item
@@ -135,7 +130,6 @@ function relativeToAbsoluteUrl(contentData, url) {
 
 let util = {
     keyMatch,
-    getUrlOut,
     sortDataToArray,
     toAbsoluteUrl,
     formatUrl,
