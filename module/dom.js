@@ -9,11 +9,11 @@ module.exports = function (content) {
 
 
     /**
-     * @description returns back the Dom content from the page's body
-     * @param selector
-     * @param selectBy
-     * @param callback
-     * @param url
+     * @description returns back the DOM content from the page's body
+     * @param {Object} selector
+     * @param {Object} selectBy
+     * @param {Function} callback
+     * @param {Object|String} url
      * @return {*}
      */
     function getDomContents(selector, selectBy, callback, url, groupSelector) {
@@ -40,7 +40,12 @@ module.exports = function (content) {
         return contentData;
     }
 
-
+/**
+ * @description sort the data to it's group
+ * @param {Object} selector 
+ * @param {Object} selectBy 
+ * @param {CheerioStatic} $ 
+ */
     function sortInGroup(selector, selectBy, $) {
         const {
             groups,
@@ -83,10 +88,10 @@ module.exports = function (content) {
 
     /**
      * @description extracts the data by the name given to the selector Object keys.
-     * @param selector
-     * @param selectBy
-     * @param $
-     * @return {{}}
+     * @param {Object} selector
+     * @param {Object} selectBy
+     * @param {CheerioStatic} $
+     * @return {Object}
      */
     function sortIndividuallyByName(selector, selectBy, $) {
         let contentData = {};
