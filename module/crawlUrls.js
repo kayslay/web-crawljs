@@ -12,7 +12,7 @@ module.exports = function () {
     let gen, visitedLinks = [],
         getDomContents;
     let configured = false;
-    //the variables to be configured
+    //The configuration variables. They would be set by the initCrawl function
     let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false,
         groups, _groupSet ={}, rateLimit,
         //set all defaultDynamicSchemas props when the variable reference is undefined
@@ -21,9 +21,8 @@ module.exports = function () {
             fetchSelectBy: undefined,
             nextSelector: undefined,
             nextSelectBy: undefined
-        };
-
-    let fetchFn, nextFn;
+        },
+     fetchFn, nextFn;
 
     /**
      * @description visit and crawls all the urls @argument {urls}. It resolves a Promise
@@ -32,25 +31,26 @@ module.exports = function () {
      * @param {Function} resolve Promise.resole
      * @param {Function} reject Promise.reject
      */
-    function* crawlUrl(urls, resolve, reject) {
-        let visitedUrls = 0;
+    function* crawlUrls(urls, resolve, reject) {
+        let visitedUrls = 0; //keeps track of the urls visited. It increases by 1 when a url's request is pending and decreases by 1 when complete
+        //visitedUrls must == 0 before the promise can resolve 
         let initialLink = [];
         let scrapedData = [];
-        if (!Array.isArray(urls)) throw new Error('the property urls must be an Array');
+        if (!Array.isArray(urls)) throw new Error('the parameter urls must be an Array');
 
         for (let url of urls) {
-
-            if (visitedLinks.indexOf(genUniqueVisitedString(url)) === -1) { //Todo: improve the visitedLinks check
+            const visitedUrlString = genUniqueVisitedString(url)
+            if (visitedLinks.indexOf(visitedUrlString) === -1) { //Todo: improve the visitedLinks check
                 visitedUrls++;
                 if (rateLimit) {
                     yield new Promise((resolve, reject) => setTimeout(args => {
                         gen.next()
                     }, rateLimit))
                 }
-                visitedLinks.push(genUniqueVisitedString(url));
+                visitedLinks.push(visitedUrlString);
                 req(url);
             } else {
-                console.info(`${(new Date())} INFO ${genUniqueVisitedString(url)} has been visited`)
+                console.info(`${(new Date())} INFO ${visitedUrlString} has been visited`)
             }
         }
 
@@ -58,9 +58,9 @@ module.exports = function () {
             reject(new AllLinksVisitErr())
         }
 
-
         /**
-         *
+         * @description handles the request success and failure, decreases the visitedUrl count, scrapes and returns all the fetched data
+         * 
          * @param url
          * @private
          */
@@ -95,15 +95,20 @@ module.exports = function () {
     }
 
 
-    //returns the scraped data gotten from the page
+    /**
+     * @description sets the dynamic selection and calls the getDomContent to fetch data from the page
+     * @param {String|Object} url 
+     */
     function fetchFromPage(url) {
         let selector = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelector, fetchSelector);
         let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelectBy, fetchSelectBy);
 
         return getDomContents(selector, selectBy, fetchFn, url, {_groupSet,groups});
     }
-
-    //get the url's to crawl next
+  /**
+     * @description sets the dynamic selection and calls the getDomContent to fetch the links to crawl next
+     * @param {String|Object} url 
+     */
     function selectNextCrawlContent(url) {
         let selector = util.dynamicSelection(url, defaultDynamicSchemas.nextSelector, nextSelector);
         let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.nextSelectBy, nextSelectBy);
@@ -111,7 +116,9 @@ module.exports = function () {
     }
 
     /**
-     * @description configures the 
+     * @description configures the [fetch|next]Selector and [fetch|next]SelectBy. This functions performs the following:
+     * - makes sure the [fetch|next]Selector and [fetch|next]SelectBy match
+     * - sets the selector to their respective groups
      */
     function configSelectors() {
         if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new KeyMatchErr("fetchSelector","fetchSelectBy");
@@ -130,7 +137,8 @@ module.exports = function () {
     }
 
     /**
-     *
+     * @description initializes the crawl. configures the config variables and calls the crawlUrls function.
+     * starts a single step in the crawl steps.
      * @param urls
      * @param config
      * @return {Promise}
@@ -165,7 +173,7 @@ module.exports = function () {
             if (timeOut) {
                 setTimeout(() => reject(new TimeoutErr(timeOut)), timeOut)
             }
-            gen = crawlUrl(urls, resolve, reject)
+            gen = crawlUrls(urls, resolve, reject)
             gen.next()
             return gen
         })
