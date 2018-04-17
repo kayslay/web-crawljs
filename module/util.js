@@ -57,9 +57,9 @@ function genUniqueVisitedString(url) {
 }
 
 /**
- * @description coverts an object to an array
+ * @description coverts the return data to an array
  * @param data
- * @return {*}
+ * @return {String[]}
  */
 function sortDataToArray(data) {
     return data.reduce((acc, item) => {
@@ -73,8 +73,18 @@ function sortDataToArray(data) {
 }
 
 /**
- * @description returns a url; the url can either be a string or an Object supported by request package
- * @param {String} url
+ * @description the default formatUrl callback. The formatUrl is used to format the url to crawl next
+ * if there is a need to change the url for any reason it can be used
+ * Example: This function changes any url that match "http://wiki.com/" and returns a new url that makes a HEAD method request to the url.
+ * any url not matching "http://wiki.com/" is returned as it is.
+ *  
+ * function(url){
+ *   if (/http:\/\/wiki.com\/?/.test(url)){
+ *      return {url:"https://wiki.org", method:"HEAD"}
+ *      }
+ *  return url
+ * }
+ * @param {String} url the url string
  * @return {String|Object}
  */
 function formatUrl(url) {

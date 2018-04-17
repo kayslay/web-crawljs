@@ -23,11 +23,11 @@ function createCrawler(config = {}) {
     //    console.log("---depthFn called---")
     }
 
-    function defaultFinalFn() {
-        // console.log('---finalFn called---')
+    function defaultFinalFn(err) {
+        if (err) throw err
+        return
     }
-
-
+    
     //immediately configure the crawl
     (function (config = {}) {
         ({

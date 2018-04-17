@@ -1,6 +1,6 @@
 let expect = require('chai').expect;
 
-describe("Test Crawler",()=>{
+describe("Test Crawler: XAMPP localhost",()=>{
     it("Data should match expect values :non-group",async()=>{
         let Crawler = require('../index')({
             fetchSelector: {title: "title"},
@@ -49,9 +49,6 @@ describe("Test Crawler",()=>{
             //   console.dir(data,{colors:true,depth:5})
               expect(data).to.be.an("object")
               expect(data.nav).to.be.an("array")
-            },
-            finalFn: function (err) {
-                if (err) throw err
             },
             timeOut: 1000,
             limitNextLinks: 3,
