@@ -4,6 +4,10 @@
 const _ = require("lodash")
 const crawlUrls= require('./crawlUrls')
 
+/**
+ * @description creates a crawler from a given config
+ * @param {Object} config the configuration objects
+ */
 function createCrawler(config = {}) {
     const {
         initCrawl
@@ -15,21 +19,21 @@ function createCrawler(config = {}) {
     let urls, finalFn, depthFn, depth, limitNextLinks, nextCrawlWait;
 
     //
-    function defaultLoopFn(data) {
-        console.log("---depth---")
+    function defaultDepthFn(data) {
+    //    console.log("---depthFn called---")
     }
 
-    function defaultFinalFn() {
-        console.log('---final---')
+    function defaultFinalFn(err) {
+        if (err) throw err
+        return
     }
-
-
+    
     //immediately configure the crawl
     (function (config = {}) {
         ({
             urls = [],
             finalFn = defaultFinalFn,
-            depthFn = defaultLoopFn,
+            depthFn = defaultDepthFn,
             depth = 1,
             limitNextLinks,
             nextCrawlWait = 0, //rate limit in what
@@ -64,7 +68,7 @@ function createCrawler(config = {}) {
                 break;
             }
             if (nextLinks.length == 0) {
-                console.log('nextLinks array empty');
+                // console.log('nextLinks array empty; crawl ending');
                 break
             }
             //wait
