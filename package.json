@@ -24,7 +24,7 @@
   "dependencies": {
     "cheerio": "^0.22.0",
     "lodash": "^4.17.4",
-    "request": "^2.81.0"
+    "request": "^2.85.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
