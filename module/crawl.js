@@ -2,7 +2,7 @@
  * Created by kayslay on 5/28/17.
  */
 const _ = require("lodash")
-const crawlUrls= require('./crawlUrls')
+const crawlUrls = require('./crawlUrls')
 
 /**
  * @description creates a crawler from a given config
@@ -20,14 +20,14 @@ function createCrawler(config = {}) {
 
     //
     function defaultDepthFn(data) {
-    //    console.log("---depthFn called---")
+        //    console.log("---depthFn called---")
     }
 
     function defaultFinalFn(err) {
         if (err) throw err
         return
     }
-    
+
     //immediately configure the crawl
     (function (config = {}) {
         ({
@@ -42,7 +42,7 @@ function createCrawler(config = {}) {
     })(config);
 
     /**
-     * @description
+     * @description crawls a single depth level
      */
     function crawl() {
 
@@ -59,8 +59,12 @@ function createCrawler(config = {}) {
 
     }
 
-
-    function* crawlGen(resolve,reject) {
+    /**
+     * @description generator that handle each depth level of the crawl
+     * @param {function(Object)} resolve 
+     * @param {function(Object)} reject 
+     */
+    function* crawlGen(resolve, reject) {
         for (let i = 0; i < depth; i++) {
             nextLinks = yield crawl();
             if (nextLinks.err) {
@@ -86,13 +90,16 @@ function createCrawler(config = {}) {
         resolve()
     }
 
+    /**
+     * @description start crawling all the links
+     */
     function CrawlAllUrl() {
-       return new Promise((resolve,reject)=>{
-             gen = crawlGen(resolve,reject);
-        gen.next();
-        return gen
-       }).then(()=>finalFn())
-       .catch(err=>finalFn(err))
+        return new Promise((resolve, reject) => {
+                gen = crawlGen(resolve, reject);
+                gen.next();
+                return gen
+            }).then(() => finalFn())
+            .catch(err => finalFn(err))
     }
 
     return {
