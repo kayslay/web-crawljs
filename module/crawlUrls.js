@@ -5,16 +5,23 @@ const request = require('request');
 const util = require('./util');
 const dom = require('./dom');
 const _ = require('lodash');
-const {TimeoutErr,AllLinksVisitErr,KeyMatchErr} = require("./errors")
-const {genUniqueVisitedString} = util;
+const {
+    TimeoutErr,
+    AllLinksVisitErr,
+    KeyMatchErr
+} = require("./errors")
+const {
+    genUniqueVisitedString
+} = util;
 
 module.exports = function () {
-    let gen, visitedLinks = [],
+    let visitedLinks = [],
         getDomContents;
     let configured = false;
     //The configuration variables. They would be set by the initCrawl function
     let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false,
-        groups, _groupSet ={}, rateLimit,
+        groups, _groupSet = {},
+        rateLimit,
         //set all defaultDynamicSchemas props when the variable reference is undefined
         defaultDynamicSchemas = {
             fetchSelector: undefined,
@@ -22,7 +29,7 @@ module.exports = function () {
             nextSelector: undefined,
             nextSelectBy: undefined
         },
-     fetchFn, nextFn;
+        fetchFn, nextFn;
 
     /**
      * @description visit and crawls all the urls @argument {urls}. It resolves a Promise
@@ -31,7 +38,7 @@ module.exports = function () {
      * @param {Function} resolve Promise.resole
      * @param {Function} reject Promise.reject
      */
-    function* crawlUrls(urls, resolve, reject) {
+    async function crawlUrls(urls, resolve, reject) {
         let visitedUrls = 0; //keeps track of the urls visited. It increases by 1 when a url's request is pending and decreases by 1 when complete
         //visitedUrls must == 0 before the promise can resolve 
         let initialLink = [];
@@ -43,8 +50,8 @@ module.exports = function () {
             if (visitedLinks.indexOf(visitedUrlString) === -1) { //Todo: improve the visitedLinks check
                 visitedUrls++;
                 if (rateLimit) {
-                    yield new Promise((resolve, reject) => setTimeout(args => {
-                        gen.next()
+                    await new Promise((resolve, reject) => setTimeout(args => {
+                        resolve(null)
                     }, rateLimit))
                 }
                 visitedLinks.push(visitedUrlString);
@@ -103,9 +110,12 @@ module.exports = function () {
         let selector = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelector, fetchSelector);
         let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelectBy, fetchSelectBy);
 
-        return getDomContents(selector, selectBy, fetchFn, url, {_groupSet,groups});
+        return getDomContents(selector, selectBy, fetchFn, url, {
+            _groupSet,
+            groups
+        });
     }
-  /**
+    /**
      * @description sets the dynamic selection and calls the getDomContent to fetch the links to crawl next
      * @param {String|Object} url 
      */
@@ -121,8 +131,8 @@ module.exports = function () {
      * - sets the selector to their respective groups
      */
     function configSelectors() {
-        if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new KeyMatchErr("fetchSelector","fetchSelectBy");
-        if (!util.keyMatch(nextSelector, nextSelectBy)) throw new KeyMatchErr("nextSelector","nextSelectBy");
+        if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new KeyMatchErr("fetchSelector", "fetchSelectBy");
+        if (!util.keyMatch(nextSelector, nextSelectBy)) throw new KeyMatchErr("nextSelector", "nextSelectBy");
 
         Object.entries(fetchSelector).forEach(selector => {
             if (selector[1]._group) {
@@ -173,9 +183,7 @@ module.exports = function () {
             if (timeOut) {
                 setTimeout(() => reject(new TimeoutErr(timeOut)), timeOut)
             }
-            gen = crawlUrls(urls, resolve, reject)
-            gen.next()
-            return gen
+            crawlUrls(urls, resolve, reject)
         })
     }
 
