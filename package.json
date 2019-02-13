@@ -23,7 +23,7 @@
   "homepage": "https://github.com/www.github.com/kayslay#readme",
   "dependencies": {
     "cheerio": "^0.22.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.11",
     "request": "^2.87.0"
   },
   "devDependencies": {
