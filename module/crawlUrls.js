@@ -47,7 +47,7 @@ module.exports = function () {
 
         for (let url of urls) {
             const visitedUrlString = genUniqueVisitedString(url)
-            if (visitedLinks.indexOf(visitedUrlString) === -1) { //Todo: improve the visitedLinks check
+            if (visitedLinks.indexOf(visitedUrlString) === -1) { //TODO: improve the visitedLinks check
                 visitedUrls++;
                 if (rateLimit) {
                     await new Promise((resolve, reject) => setTimeout(args => {
