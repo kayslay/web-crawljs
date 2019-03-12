@@ -14,8 +14,6 @@ function createCrawler(config = {}) {
     } = crawlUrls()
     let gen;
 
-
-
     let {
         urls = [],
             finalFn = defaultFinalFn,
@@ -42,7 +40,6 @@ function createCrawler(config = {}) {
                     err
                 })
             });
-
     }
 
     /**

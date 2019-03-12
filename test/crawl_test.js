@@ -1,6 +1,7 @@
 let expect = require('chai').expect;
 
-describe("Test Crawler: Example.com", () => {
+describe("Test Crawler: Example.com", function() {
+    this.timeout(0)
     it("Data should match expect values [non-group]", async () => {
         let Crawler = require('../index')({
             fetchSelector: {
@@ -19,20 +20,10 @@ describe("Test Crawler: Example.com", () => {
                 expect(data).to.be.an("object")
                 expect(data.title).to.be.an("array")
             },
-            formatUrl: function (url) {
-                console.log("formatUrl called")
-                if (url == 'https://en.wikipedia.org') {
-                    return {
-                        url
-                    }
-                }
-                return url
-            },
-
             nextFn: function (err, data, url) {
                 // console.log(data,url)
             },
-            timeOut: 1000,
+            timeOut: 10000,
             limitNextLinks: 5,
             dynamicSchemas: {
                 //when the url matches https://en.wikipedia.org it uses this schema to format it
@@ -66,7 +57,7 @@ describe("Test Crawler: Example.com", () => {
             depthFn: function (data) {
                 // console.log(data)
             },
-            depth: 3,
+            depth: 1,
             urls: ['https://en.wikipedia.org/wiki/Web_crawler']
         });
         await Crawler.CrawlAllUrl();
@@ -103,7 +94,7 @@ describe("Test Crawler: Example.com", () => {
             },
             timeOut: 10000,
             limitNextLinks: 3,
-            depth: 2,
+            depth: 1,
             urls: ['http://example.com']
         });
         await Crawler.CrawlAllUrl();

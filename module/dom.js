@@ -40,18 +40,17 @@ module.exports = function (content) {
         return contentData;
     }
 
-/**
- * @description sort the data to it's group
- * @param {Object} selector 
- * @param {Object} selectBy 
- * @param {CheerioStatic} $ 
- */
+    /**
+     * @description sort the data to it's group
+     * @param {Object} selector 
+     * @param {Object} selectBy 
+     * @param {CheerioStatic} $ 
+     */
     function sortInGroup(selector, selectBy, $) {
         const {
             groups,
             _groupSet
         } = selector
-        const keyVal = Object.entries(_groupSet)
         let contentData = {}
         //loop through the groups
         for (let key in groups) {
