@@ -14,7 +14,7 @@ let urlModule = require('url');
  */
 function keyMatch(obj1, obj2) {
     let key1 = Object.keys(obj1).sort();
-    let key2 = Object.keys(obj2).filter(k=> (key1.indexOf(k) != -1)).sort();
+    let key2 = Object.keys(obj2).filter(k => (key1.indexOf(k) != -1)).sort();
     return _.isEqual(key1, key2);
 }
 
@@ -46,12 +46,25 @@ function getUrlOut(url) {
     }
 }
 
+/**
+ * @description generate a unique string identifier to marks a link has visited
+ * @param {String|Object} url 
+ */
 function genUniqueVisitedString(url) {
+    // TODO make the identifier better. should support headers and all http request features
     if (typeof url === 'string') {
-        const {host,path,protocol} = urlModule.parse(url)
+        const {
+            host,
+            path,
+            protocol
+        } = urlModule.parse(url)
         return `[GET] ${protocol}//${host}${path}`;
-    } else if (typeof url == 'object') {            
-        const {host,path,protocol} = urlModule.parse(url.url)
+    } else if (typeof url == 'object') {
+        const {
+            host,
+            path,
+            protocol
+        } = urlModule.parse(url.url)
         return `[${url.method?`${url.method.toUpperCase()}`:'GET'}] ${protocol}//${host}${path}`;
     }
 }
@@ -63,7 +76,7 @@ function genUniqueVisitedString(url) {
  */
 function sortDataToArray(data) {
     return data.reduce((acc, item) => {
-        
+
         let packedItem = [];
         for (let i in item) {
             packedItem = packedItem.concat(item[i]);
@@ -74,7 +87,8 @@ function sortDataToArray(data) {
 
 /**
  * @description the default formatUrl callback. The formatUrl is used to format the url to crawl next
- * if there is a need to change the url for any reason it can be used
+ * if there is a need to change the url for any reason it can be used.
+ * 
  * Example: This function changes any url that match "http://wiki.com/" and returns a new url that makes a HEAD method request to the url.
  * any url not matching "http://wiki.com/" is returned as it is.
  *  
@@ -99,7 +113,6 @@ function formatUrl(url) {
  * @return {*}
  */
 function dynamicSelection(url, dynamic, defaultSelection) {
-    
     if (dynamic) {
         let formattedUrl = getUrlOut(url);
         for (let x of dynamic) {
@@ -107,13 +120,12 @@ function dynamicSelection(url, dynamic, defaultSelection) {
                 return x.schema;
             }
         }
-        return defaultSelection
     }
     return defaultSelection
 }
 
-function empty(obj){
-    for (let i in obj){
+function empty(obj) {
+    for (let i in obj) {
         return false
     }
     return true

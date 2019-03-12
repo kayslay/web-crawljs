@@ -47,7 +47,7 @@ module.exports = function () {
 
         for (let url of urls) {
             const visitedUrlString = genUniqueVisitedString(url)
-            if (visitedLinks.indexOf(visitedUrlString) === -1) { //Todo: improve the visitedLinks check
+            if (visitedLinks.indexOf(visitedUrlString) === -1) { //TODO: improve the visitedLinks check
                 visitedUrls++;
                 if (rateLimit) {
                     await new Promise((resolve, reject) => setTimeout(args => {
@@ -66,8 +66,9 @@ module.exports = function () {
         }
 
         /**
-         * @description handles the request success and failure, decreases the visitedUrl count, scrapes and returns all the fetched data
-         * 
+         * @description decrement the visitedLink count, makes request to the url passed to it
+         * get the response of the request and extract the data needed from the response body.
+         * the data extracted is appended to scrapedData. when the visitedLink count is 0 the promise is resolved
          * @param url
          * @private
          */
@@ -131,9 +132,11 @@ module.exports = function () {
      * - sets the selector to their respective groups
      */
     function configSelectors() {
+        // check if the fetchSelector has a fetchSelectBy that matches key
         if (!util.keyMatch(fetchSelector, fetchSelectBy)) throw new KeyMatchErr("fetchSelector", "fetchSelectBy");
+        // check if the nextSelector has a nextSelectBy that match in keys 
         if (!util.keyMatch(nextSelector, nextSelectBy)) throw new KeyMatchErr("nextSelector", "nextSelectBy");
-
+        // sort group in the fetchSelector to their respective _groupSet
         Object.entries(fetchSelector).forEach(selector => {
             if (selector[1]._group) {
                 if (!_groupSet[selector[1]._group]) {

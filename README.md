@@ -1,7 +1,7 @@
 # web-crawlerjs
 
 ## About 
-web-crawlerjs is a package that extracts information from a web page. web-crawljs depends on [request](https://www.npmjs.com/package/request) and [cheerio](https://www.npmjs.com/package/cheerio).
+web-crawlerjs is a package that extracts information from a web page. This package depends on [request](https://www.npmjs.com/package/request) and [cheerio](https://www.npmjs.com/package/cheerio).
 
 web-crawlerjs crawl pages using a [Breadth-First Algorithm](https://en.wikipedia.org/wiki/Breadth-first_search).
 
@@ -12,39 +12,52 @@ run this on your terminal or command prompt.
 
 ## Example
 
-An example of the usage of web-crawljs. This example extracts data from [https://exmale.com](https://exmale.com)
+An example of the usage of web-crawljs. This example extracts data from [https://example.com](https://example.com)
 
 <!-- TODO: fit example for example.com -->
 ```javascript
     const crawler = require('web-crawljs');
     const config = {
-               fetchSelector: {title: "title", body: "div#mw-content-text"},
-               fetchSelectBy: {title: 'text', body: "text"},
-               nextSelector: {links: 'a[href^="/"]'},
-               nextSelectBy: {links: ['attr', 'href']},
+            fetchSelector: {title: "title"},
+            fetchSelectBy: {title: 'text'},
+            nextSelector: {links: 'a[href^="/"]'},
+            nextSelectBy: {links: ['attr', 'href']},
                fetchFn: (err, data, url) => {
-                   if (err) console.error(err.message);
-                   if (url == 'http://localhost/dashboard/') console.log('saving somewhere different', data);
+                   if (err) {
+                      return console.error(err.message);
+                   }
                    console.log(data.title[0],url)
                }, 
                nextFn: function (err, data, url) {
                    console.log(data,url)
                },
                dynamicSchemas: {
-                   fetchSelector: [{url: /http:\/\/localhost\//, schema: {title: "title"}}],
-                   fetchSelectBy: [{url: /http:\/\/localhost\//, schema: {title: "text"}}],
+                    fetchSelector: [{
+                    url: /https:\/\/en.wikipedia.org/,
+                    schema: {
+                        title: "title",
+                        body: "div#mw-content-text"
+                    }
+                }],
+                fetchSelectBy: [{
+                    url: /https:\/\/en.wikipedia.org/,
+                    schema: {
+                        title: "text",
+                        body: "text"
+                    }
+                }],
                },
                depthFn: function (data) {
                    console.log(data)
                },
                formatUrl: function (url) {
-                   if (url == 'http://localhost/dashboard/faq.html') {
+                   if (url == 'https://en.wikipedia.org/wiki') {
                        return {url:url, method: "HEAD"}
                    }
                    return url
                },
                depth: 2,
-               urls: ['http://localhost/dashboard/']
+               urls:  ['https://en.wikipedia.org/wiki/Web_crawler']
            };
     //initiate the crawl object
     const Crawler = crawler(config);
@@ -69,8 +82,9 @@ The config argument is the only argument passed into the crawler factory functio
 This argument configures the callbacks, the schemas of the selector, depth, the urls to visit e.t.c.
 
 ### Fetching data and setting next links to visit
-These properties are responsible for fetching data and getting the next links to visit next. The fetchSelector and nextSelector are used to assign the elements to scrap.
-The fetchSelectBy and nextSelectBy are used to define the way you want to select data from the page. For example, you can select by attribute name, text, value, text, html value e.t.c.
+
+These properties are responsible for fetching data and getting the next links to visit next. The `fetchSelector` and `nextSelector` are used to assign the elements to scrap.
+The `fetchSelectBy` and `nextSelectBy` define the what will be extracted from the selector. For example, you can select by attribute name, text, value, text, html value e.t.c.
 
 #### fetchSelector
 
