@@ -5,46 +5,30 @@ const _ = require("lodash")
 const crawlUrls = require('./crawlUrls')
 
 /**
- * @description creates a crawler from a given config
+ * @description creates a new instance of a crawler from the config passed parameter passed
  * @param {Object} config the configuration objects
  */
 function createCrawler(config = {}) {
     const {
         initCrawl
     } = crawlUrls()
-
-    let nextLinks = [];
     let gen;
 
-    let urls, finalFn, depthFn, depth, limitNextLinks, nextCrawlWait;
-
-    //
-    function defaultDepthFn(data) {
-        //    console.log("---depthFn called---")
-    }
-
-    function defaultFinalFn(err) {
-        if (err) throw err
-        return
-    }
-
-    //immediately configure the crawl
-    (function (config = {}) {
-        ({
-            urls = [],
+    let {
+        urls = [],
             finalFn = defaultFinalFn,
             depthFn = defaultDepthFn,
             depth = 1,
             limitNextLinks,
             nextCrawlWait = 0, //rate limit in what
-        } = config);
-        nextLinks = nextLinks.concat(urls);
-    })(config);
+    } = config
+    nextLinks = urls;
 
     /**
-     * @description crawls a single depth level
+     * @description crawls a complete step for a  list of links. it crawls a single depth
+     * it yield control to the depthCrawl when it's done. calls depthFn if the step was successful
      */
-    function crawl() {
+    function singleDepthCrawl() {
 
         initCrawl(nextLinks, config)
             .then(scrapedData => {
@@ -56,17 +40,17 @@ function createCrawler(config = {}) {
                     err
                 })
             });
-
     }
 
     /**
-     * @description generator that handle each depth level of the crawl
-     * @param {function(Object)} resolve 
-     * @param {function(Object)} reject 
+     * @description function crawls till the depth is reached, an error occurs or there is no
+     *  more link to crawl.
+     * @param {function(Object)} resolve called when the complete successfully
+     * @param {function(Object)} reject called when an error occurs 
      */
-    function* crawlGen(resolve, reject) {
+    function* depthCrawl(resolve, reject) {
         for (let i = 0; i < depth; i++) {
-            nextLinks = yield crawl();
+            nextLinks = yield singleDepthCrawl();
             if (nextLinks.err) {
                 reject(nextLinks.err);
                 break;
@@ -95,7 +79,7 @@ function createCrawler(config = {}) {
      */
     function CrawlAllUrl() {
         return new Promise((resolve, reject) => {
-                gen = crawlGen(resolve, reject);
+                gen = depthCrawl(resolve, reject);
                 gen.next();
                 return gen
             }).then(() => finalFn())
@@ -108,3 +92,13 @@ function createCrawler(config = {}) {
 
 }
 module.exports = createCrawler;
+
+//
+function defaultDepthFn(data) {
+    //    console.log("---depthFn called---")
+}
+
+function defaultFinalFn(err) {
+    if (err) throw err
+    return
+}
