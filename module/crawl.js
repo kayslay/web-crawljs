@@ -2,7 +2,11 @@
  * Created by kayslay on 5/28/17.
  */
 const _ = require("lodash")
+const util = require('./util');
 const crawlUrls = require('./crawlUrls')
+const {
+    delay
+} = util;
 
 /**
  * @description creates a new instance of a crawler from the config passed parameter passed
@@ -61,9 +65,9 @@ function createCrawler(config = {}) {
             }
             //wait
             if (nextCrawlWait) {
-                yield new Promise((r, x) => setTimeout(args => {
+                yield delay(nextCrawlWait, function () {
                     gen.next()
-                }, nextCrawlWait))
+                })
             }
             //limit the links return
             if (limitNextLinks) { //limit the amount of links returned

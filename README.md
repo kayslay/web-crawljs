@@ -67,19 +67,20 @@ An example of the usage of web-crawljs. This example extracts data from [https:/
 
 ## Understanding the example
 
-***require('web-crawljs');*** returns a factory function that takes in one argument. This argument is the configuration object. The configuration Object is used to configure the crawler.
+***require('web-crawljs');*** returns a factory function that takes in one argument. This argument is the configuration object. The configuration Object is used to configure the behaviour of crawler.
 
         const crawler = require('web-crawljs');
         const config = {...}
         const Crawler = crawler(config)
 
-calling *crawler(config)*, in the example above returns a new Object, this object has a single method called `CrawlAllUrl`. `CrawlAllUrl` starts the crawl and returns a Promise when its done.
+calling *crawler(config)*, in the example above returns a new Object, this object has a single method, `CrawlAllUrl`. `CrawlAllUrl` starts the crawl and returns a Promise when its done.
 The Promise success value or failure error depends on the `finalFn` function. More will be explained in the `finalFn` section.
 
-## The config argument
+## The config object
 
-The config argument is the only argument passed into the crawler factory function. It configure the way the crawler would behave. 
-This argument configures the callbacks, the schemas of the selector, depth, the urls to visit e.t.c.
+The config object is the only argument passed into the crawler factory function. It configures the way the crawler would behave. 
+This object configures the callbacks, the schemas of the selector, depth, the urls to visit e.t.c.
+
 
 ### Fetching data and setting next links to visit
 
@@ -184,8 +185,7 @@ This function is called at the end of the entire crawl. It takes an error as its
 
 The value of the promise depends on the value returned from the finalFn.
 
-**NOTE::** If the finalFn is set, ensure it handles the error. If the error is not handled by the finalFn the error must be thrown to be handled by a catch
-when the `CrawlAllUrl` is done unless the error will not be handled.
+**NOTE::** If the finalFn is set, ensure it handles the error. If the error is not handled by the finalFn the error must be thrown to be handled by a catch when the `CrawlAllUrl` is done unless the error will not be handled.
 
 ## Other Properties
 
@@ -252,3 +252,7 @@ This property sets the time limit for getting the data from all the links in an 
 ### limitNextLinks
 
 This property limits the amount of links that will be returned to be crawled. If `limitNextLinks` is greater than the default nextLinks length, it won't be used.
+
+### skipDuplicates
+
+This properties tells the crawler to skip a link it has visited before if true. the default value is `true`.
