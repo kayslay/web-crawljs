@@ -11,7 +11,8 @@ const {
     KeyMatchErr
 } = require("./errors")
 const {
-    genUniqueVisitedString
+    genUniqueVisitedString,
+    delay
 } = util;
 
 module.exports = function () {
@@ -46,9 +47,7 @@ module.exports = function () {
             if (!skipDuplicates || visitedLinks.indexOf(visitedUrlString) === -1) {
                 visitedUrls++;
                 if (rateLimit) { //checks if ratelimit is set, and wait for the rateLimit before continuing
-                    await new Promise((resolve, reject) => setTimeout(args => {
-                        resolve(null)
-                    }, rateLimit))
+                    await delay(rateLimit)
                 }
                 visitedLinks.push(visitedUrlString);
                 // make request
