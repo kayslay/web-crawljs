@@ -31,7 +31,7 @@ describe("Test Crawler: Example.com", function () {
             nextFn: function (err, data, url) {
                 // console.log(data,url)
             },
-            timeOut: 100,
+            timeOut: 10000,
             limitNextLinks: 5,
             dynamicSchemas: {
                 //when the url matches https://en.wikipedia.org it uses this schema to format it
