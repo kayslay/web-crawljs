@@ -1,6 +1,6 @@
 {
   "name": "web-crawljs",
-  "version": "2.1.5",
+  "version": "2.2.0",
   "description": "simple web crawler",
   "main": "index.js",
   "scripts": {
