@@ -252,3 +252,7 @@ This property sets the time limit for getting the data from all the links in an 
 ### limitNextLinks
 
 This property limits the amount of links that will be returned to be crawled. If `limitNextLinks` is greater than the default nextLinks length, it won't be used.
+
+### skipDuplicates
+
+This properties tells the crawler to skip a link it has visited before if true. the default value is `true`.

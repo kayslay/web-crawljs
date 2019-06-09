@@ -44,7 +44,8 @@ module.exports = function () {
 
         for (let url of urls) {
             const visitedUrlString = genUniqueVisitedString(url)
-            if (!skipDuplicates || visitedLinks.indexOf(visitedUrlString) === -1) {
+            // skip if skipDuplicates is true and the link has been visited 
+            if (!(skipDuplicates && visitedLinks.indexOf(visitedUrlString) !== -1)) {
                 visitedUrls++;
                 if (rateLimit) { //checks if ratelimit is set, and wait for the rateLimit before continuing
                     await delay(rateLimit)
