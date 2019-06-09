@@ -1,14 +1,16 @@
 let expect = require('chai').expect;
 
-describe("Test Crawler: Example.com", function() {
+describe("Test Crawler: Example.com", function () {
     this.timeout(0)
     it("Data should match expect values [non-group]", async () => {
         let Crawler = require('../index')({
             fetchSelector: {
-                title: "title"
+                title: "title",
+                body: "div#mw-content-text"
             },
             fetchSelectBy: {
-                title: 'text'
+                title: 'text',
+                body: "text"
             },
             nextSelector: {
                 links: 'a[href^="/"]'
@@ -19,11 +21,17 @@ describe("Test Crawler: Example.com", function() {
             fetchFn: (err, data, url) => {
                 expect(data).to.be.an("object")
                 expect(data.title).to.be.an("array")
+                if (/https:\/\/en.wikipedia.org/.test(url)) {
+                    expect(data.dynamicBody).to.be.an("array")
+                    expect(data.body).not.to.be.an("array")
+                    return
+                }
+                expect(data.body).to.be.an("array")
             },
             nextFn: function (err, data, url) {
                 // console.log(data,url)
             },
-            timeOut: 10000,
+            timeOut: 100,
             limitNextLinks: 5,
             dynamicSchemas: {
                 //when the url matches https://en.wikipedia.org it uses this schema to format it
@@ -31,14 +39,14 @@ describe("Test Crawler: Example.com", function() {
                     url: /https:\/\/en.wikipedia.org/,
                     schema: {
                         title: "title",
-                        body: "div#mw-content-text"
+                        dynamicBody: "div#mw-content-text"
                     }
                 }],
                 fetchSelectBy: [{
                     url: /https:\/\/en.wikipedia.org/,
                     schema: {
                         title: "text",
-                        body: "text"
+                        dynamicBody: "text"
                     }
                 }],
                 nextSelector: [{
@@ -60,7 +68,7 @@ describe("Test Crawler: Example.com", function() {
             depth: 1,
             urls: ['https://en.wikipedia.org/wiki/Web_crawler']
         });
-        await Crawler.CrawlAllUrl();
+        await Crawler.CrawlAllUrl().catch(err => expect(err).not.to.be.an("error"));
     })
     it("Data Should match expected type [group]", async function () {
         const Crawler = require('../index')({
