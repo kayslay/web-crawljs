@@ -149,6 +149,18 @@ function relativeToAbsoluteUrl(contentData, url) {
     }
 }
 
+/**
+ * @description resolves a promise after time ms
+ * @param {number} time the time to wait
+ * @param {function} cb a callback to execute when the wait is over
+ */
+function delay(time, cb) {
+    return new Promise((resolve, reject) => setTimeout(args => {
+        resolve(null);
+        (typeof cb == 'function') && cb()
+    }, time))
+}
+
 
 let util = {
     keyMatch,
@@ -158,6 +170,7 @@ let util = {
     dynamicSelection,
     relativeToAbsoluteUrl,
     genUniqueVisitedString,
-    empty
+    empty,
+    delay,
 };
 exports = module.exports = util;

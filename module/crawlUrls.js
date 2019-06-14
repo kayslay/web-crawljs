@@ -11,7 +11,8 @@ const {
     KeyMatchErr
 } = require("./errors")
 const {
-    genUniqueVisitedString
+    genUniqueVisitedString,
+    delay
 } = util;
 
 module.exports = function () {
@@ -21,14 +22,10 @@ module.exports = function () {
     //The configuration variables. They would be set by the initCrawl function
     let fetchSelector, fetchSelectBy, nextSelector, nextSelectBy, formatUrl, timeOut = false,
         groups, _groupSet = {},
+        skipDuplicates = true,
         rateLimit,
-        //set all defaultDynamicSchemas props when the variable reference is undefined
-        defaultDynamicSchemas = {
-            fetchSelector: undefined,
-            fetchSelectBy: undefined,
-            nextSelector: undefined,
-            nextSelectBy: undefined
-        },
+        //set all _dynamicSchemas props when the variable reference is undefined
+        _dynamicSchemas = {},
         fetchFn, nextFn;
 
     /**
@@ -47,15 +44,34 @@ module.exports = function () {
 
         for (let url of urls) {
             const visitedUrlString = genUniqueVisitedString(url)
-            if (visitedLinks.indexOf(visitedUrlString) === -1) { //TODO: improve the visitedLinks check
+            // skip if skipDuplicates is true and the link has been visited 
+            if (!(skipDuplicates && visitedLinks.indexOf(visitedUrlString) !== -1)) {
                 visitedUrls++;
-                if (rateLimit) {
-                    await new Promise((resolve, reject) => setTimeout(args => {
-                        resolve(null)
-                    }, rateLimit))
+                if (rateLimit) { //checks if ratelimit is set, and wait for the rateLimit before continuing
+                    await delay(rateLimit)
                 }
                 visitedLinks.push(visitedUrlString);
-                req(url);
+                // make request
+                request(url, function (err, response, body) {
+                    visitedUrls--;
+                    if (err) {
+                        console.error(`${(new Date())} ERROR ${err.message}`);
+                    } else {
+                        getDomContents = dom(body).getDomContents; //
+                        scrapedData.push(fetchFromPage(url));
+                        let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)]).map(url => {
+                            return formatUrl(url)
+                        }));
+                        initialLink = initialLink.concat(newLink);
+                    }
+
+                    if (visitedUrls == 0) {
+                        resolve({
+                            fetchedData: scrapedData,
+                            nextLinks: initialLink
+                        })
+                    }
+                });
             } else {
                 console.info(`${(new Date())} INFO ${visitedUrlString} has been visited`)
             }
@@ -63,41 +79,6 @@ module.exports = function () {
 
         if (visitedUrls == 0) { //if visited links is 0 it means it there is no more link to crawl. Fail.
             reject(new AllLinksVisitErr())
-        }
-
-        /**
-         * @description decrement the visitedLink count, makes request to the url passed to it
-         * get the response of the request and extract the data needed from the response body.
-         * the data extracted is appended to scrapedData. when the visitedLink count is 0 the promise is resolved
-         * @param url
-         * @private
-         */
-
-        function req(url) {
-
-            request(url, function (err, response, body) {
-                visitedUrls--;
-                if (err) {
-                    //todo: context kill
-                    console.error(`${(new Date())} ERROR ${err.message}`);
-                } else {
-                    //Todo: context kill
-                    getDomContents = dom(body).getDomContents; //
-                    scrapedData.push(fetchFromPage(url));
-                    let newLink = _.uniq(util.sortDataToArray([selectNextCrawlContent(url)]).map(url => {
-                        return formatUrl(url)
-                    }));
-                    initialLink = initialLink.concat(newLink);
-                }
-
-                if (visitedUrls == 0) {
-                    resolve({
-                        fetchedData: scrapedData,
-                        nextLinks: initialLink
-                    })
-                }
-            });
-
         }
 
     }
@@ -108,8 +89,8 @@ module.exports = function () {
      * @param {String|Object} url 
      */
     function fetchFromPage(url) {
-        let selector = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelector, fetchSelector);
-        let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.fetchSelectBy, fetchSelectBy);
+        let selector = util.dynamicSelection(url, _dynamicSchemas.fetchSelector, fetchSelector);
+        let selectBy = util.dynamicSelection(url, _dynamicSchemas.fetchSelectBy, fetchSelectBy);
 
         return getDomContents(selector, selectBy, fetchFn, url, {
             _groupSet,
@@ -121,8 +102,8 @@ module.exports = function () {
      * @param {String|Object} url 
      */
     function selectNextCrawlContent(url) {
-        let selector = util.dynamicSelection(url, defaultDynamicSchemas.nextSelector, nextSelector);
-        let selectBy = util.dynamicSelection(url, defaultDynamicSchemas.nextSelectBy, nextSelectBy);
+        let selector = util.dynamicSelection(url, _dynamicSchemas.nextSelector, nextSelector);
+        let selectBy = util.dynamicSelection(url, _dynamicSchemas.nextSelectBy, nextSelectBy);
         return getDomContents(selector, selectBy, nextFn, url);
     }
 
@@ -156,29 +137,26 @@ module.exports = function () {
      * @param config
      * @return {Promise}
      */
-    function initCrawl(urls, config) {
+    function initCrawl(urls, config = {}) {
 
         if (!configured) {
             let dynamicSchemas; // define the variable to hold the dynamic data
-            (function (config = {}) {
-
-                ({
-                    fetchSelector,
-                    fetchSelectBy,
-                    nextSelector = {},
-                    nextSelectBy = {},
-                    fetchFn,
-                    nextFn,
-                    timeOut,
-                    groups = {},
-                    rateLimit = 0,
-                    dynamicSchemas = {},
-                    formatUrl = util.formatUrl
-                } = config);
-                configSelectors()
-                Object.assign(defaultDynamicSchemas, dynamicSchemas)
-
-            })(config);
+            ({
+                fetchSelector,
+                fetchSelectBy,
+                nextSelector = {},
+                nextSelectBy = {},
+                fetchFn,
+                nextFn,
+                timeOut,
+                groups = {},
+                rateLimit = 0,
+                dynamicSchemas = {},
+                formatUrl = util.formatUrl,
+                skipDuplicates
+            } = config);
+            configSelectors()
+            Object.assign(_dynamicSchemas, dynamicSchemas)
             configured = true
         }
 
