@@ -54,7 +54,6 @@ module.exports = function (content) {
         let contentData = {}
         //loop through the groups
         for (let key in groups) {
-            console.log(key, groups)
             if (!contentData[key]) {
                 contentData[key] = []
             }
