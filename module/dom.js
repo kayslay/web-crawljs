@@ -81,8 +81,9 @@ module.exports = function (content) {
                     console.log("group selector not found on the page")
                 }
             }).get()
-            return contentData
         }
+        return contentData
+
     }
 
     /**
