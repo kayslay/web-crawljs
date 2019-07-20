@@ -54,6 +54,7 @@ module.exports = function (content) {
         let contentData = {}
         //loop through the groups
         for (let key in groups) {
+            console.log(key, groups)
             if (!contentData[key]) {
                 contentData[key] = []
             }
@@ -81,8 +82,9 @@ module.exports = function (content) {
                     console.log("group selector not found on the page")
                 }
             }).get()
-            return contentData
         }
+        return contentData
+
     }
 
     /**
