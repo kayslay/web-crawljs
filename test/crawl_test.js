@@ -73,7 +73,8 @@ describe("Test Crawler: Example.com", function () {
     it("Data Should match expected type [group]", async function () {
         const Crawler = require('../index')({
             groups: {
-                "nav": "nav ul.right li"
+                "nav": "nav ul.right li",
+                "hello": "nav ul.right li"
             },
             fetchSelector: {
                 a: {
@@ -99,6 +100,7 @@ describe("Test Crawler: Example.com", function () {
                 //   console.dir(data,{colors:true,depth:5})
                 expect(data).to.be.an("object")
                 expect(data.nav).to.be.an("array")
+                expect(data.hello).to.be.an("array")
             },
             timeOut: 10000,
             limitNextLinks: 3,
