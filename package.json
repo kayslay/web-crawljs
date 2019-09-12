@@ -4,7 +4,9 @@
   "description": "simple web crawler",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -24,10 +26,12 @@
   "dependencies": {
     "cheerio": "^0.22.0",
     "lodash": "^4.17.11",
-    "request": "^2.87.0"
+    "request": "^2.87.0",
+    "snyk": "^1.192.4"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^3.5.3"
-  }
+  },
+  "snyk": true
 }
