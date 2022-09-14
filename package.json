@@ -27,7 +27,7 @@
     "cheerio": "^0.22.0",
     "lodash": "^4.17.11",
     "request": "^2.87.0",
-    "snyk": "^1.226.2"
+    "snyk": "^1.324.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
